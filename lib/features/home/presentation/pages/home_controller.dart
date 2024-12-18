@@ -4,6 +4,7 @@ import 'package:helpnest/features/history/presentation/pages/history_page.dart';
 import 'package:helpnest/features/home/presentation/pages/home_screen.dart';
 import 'package:helpnest/features/profile/presentation/pages/profile_main_page.dart';
 import 'package:helpnest/features/search/presentation/pages/search_page.dart';
+import 'package:helpnest/features/service/presentation/pages/service_main_page.dart';
 import 'package:iconsax/iconsax.dart';
 
 class HomeController extends StatefulWidget {
@@ -25,7 +26,7 @@ class _HomeControllerState extends State<HomeController> {
 
   Padding _bottomNavBar(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -111,7 +112,7 @@ class _HomeControllerState extends State<HomeController> {
       case 1:
         return const SearchPage();
       case 2:
-        return const HomeScreen();
+        return const ServiceMainPage();
       case 3:
         return const HistoryPage();
       default:
