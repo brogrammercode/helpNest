@@ -15,98 +15,80 @@ class HomeController extends StatefulWidget {
 }
 
 class _HomeControllerState extends State<HomeController> {
-  int bottomNavIndex = 0;
+  int _bottomNavIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: _bottomNavBar(context),
-      body: _body(),
+      bottomNavigationBar: _buildBottomNavBar(context),
+      body: _buildBody(),
     );
   }
 
-  Padding _bottomNavBar(BuildContext context) {
+  /// Builds the bottom navigation bar.
+  Widget _buildBottomNavBar(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-              style: ElevatedButton.styleFrom(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  backgroundColor: bottomNavIndex == 0
-                      ? Theme.of(context).primaryColor
-                      : null),
-              onPressed: () {
-                setState(() => bottomNavIndex = 0);
-              },
-              icon: Icon(
-                Iconsax.home,
-                color: bottomNavIndex == 0 ? Colors.white : null,
-              )),
-          IconButton(
-              onPressed: () {
-                setState(() => bottomNavIndex = 1);
-              },
-              icon: Icon(
-                Iconsax.search_normal_1,
-                color: bottomNavIndex == 1 ? Colors.white : null,
-              ),
-              style: ElevatedButton.styleFrom(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  backgroundColor: bottomNavIndex == 1
-                      ? Theme.of(context).primaryColor
-                      : null)),
-          IconButton(
-              onPressed: () {
-                setState(() => bottomNavIndex = 2);
-              },
-              icon: Icon(
-                Iconsax.briefcase,
-                color: bottomNavIndex == 2 ? Colors.white : null,
-              ),
-              style: ElevatedButton.styleFrom(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  backgroundColor: bottomNavIndex == 2
-                      ? Theme.of(context).primaryColor
-                      : null)),
-          IconButton(
-              onPressed: () {
-                setState(() => bottomNavIndex = 3);
-              },
-              icon: Icon(
-                Iconsax.receipt,
-                color: bottomNavIndex == 3 ? Colors.white : null,
-              ),
-              style: ElevatedButton.styleFrom(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  backgroundColor: bottomNavIndex == 3
-                      ? Theme.of(context).primaryColor
-                      : null)),
-          IconButton(
-              onPressed: () {
-                setState(() => bottomNavIndex = 4);
-              },
-              icon: Icon(
-                Iconsax.frame_1,
-                color: bottomNavIndex == 4 ? Colors.white : null,
-              ),
-              style: ElevatedButton.styleFrom(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  backgroundColor: bottomNavIndex == 4
-                      ? Theme.of(context).primaryColor
-                      : null)),
+          _buildBottomNavButton(
+            context,
+            icon: Iconsax.home,
+            index: 0,
+          ),
+          _buildBottomNavButton(
+            context,
+            icon: Iconsax.search_normal_1,
+            index: 1,
+          ),
+          _buildBottomNavButton(
+            context,
+            icon: Iconsax.briefcase,
+            index: 2,
+          ),
+          _buildBottomNavButton(
+            context,
+            icon: Iconsax.receipt,
+            index: 3,
+          ),
+          _buildBottomNavButton(
+            context,
+            icon: Iconsax.frame_1,
+            index: 4,
+          ),
         ],
       ),
     );
   }
 
-  _body() {
-    switch (bottomNavIndex) {
+  /// Builds each bottom navigation button.
+  Widget _buildBottomNavButton(
+    BuildContext context, {
+    required IconData icon,
+    required int index,
+  }) {
+    final bool isSelected = _bottomNavIndex == index;
+    return IconButton(
+      onPressed: () => setState(() => _bottomNavIndex = index),
+      icon: Icon(
+        icon,
+        color: isSelected ? Colors.white : Theme.of(context).iconTheme.color,
+      ),
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.r),
+        ),
+      ),
+    );
+  }
+
+  /// Determines which page to display based on the selected index.
+  Widget _buildBody() {
+    switch (_bottomNavIndex) {
       case 0:
         return const HomeScreen();
       case 1:
@@ -115,8 +97,10 @@ class _HomeControllerState extends State<HomeController> {
         return const ServiceMainPage();
       case 3:
         return const HistoryPage();
-      default:
+      case 4:
         return const ProfileMainPage();
+      default:
+        return const Placeholder(); // Fallback for unexpected indices.
     }
   }
 }
