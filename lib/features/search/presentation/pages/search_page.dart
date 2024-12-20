@@ -16,150 +16,28 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appBar(context),
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
-              child: TextFormField(
-                textInputAction: TextInputAction.done,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontWeight: FontWeight.w500),
-                maxLines: null,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Iconsax.search_normal_1),
-                  filled: true,
-                  hintText: "Search for anything",
-                  fillColor: Colors.grey.withOpacity(.1),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none),
-                ),
-              ),
+            _buildSearchBar(context),
+            _buildSection(
+              title: "People",
+              itemCount: 5,
+              itemBuilder: (context, index) => _buildPersonTile(),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                  child: const Text("People",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.grey)),
-                ),
-                ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: 5,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                    ),
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ProviderProfile()));
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                ClipOval(
-                                  child: CachedNetworkImage(
-                                      height: 50.h,
-                                      width: 50.h,
-                                      fit: BoxFit.cover,
-                                      imageUrl:
-                                          "https://cdn.dribbble.com/users/6477965/screenshots/20111844/media/c7df4e1b8e3966abe967c8aa916eba86.jpg"),
-                                ),
-                                SizedBox(width: 10.w),
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Credence Anderson",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text("Plumber"),
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 15.h),
-                          ],
-                        ),
-                      );
-                    }),
-              ],
+            _buildSection(
+              title: "Services",
+              itemCount: 5,
+              itemBuilder: (context, index) => _buildServiceTile(),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                  child: const Text("Services",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.grey)),
-                ),
-                ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: 5,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                    ),
-                    itemBuilder: (context, index) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              ClipOval(
-                                child: CachedNetworkImage(
-                                    height: 50.h,
-                                    width: 50.h,
-                                    fit: BoxFit.cover,
-                                    imageUrl:
-                                        "https://cdn.dribbble.com/userupload/16281153/file/original-b6ff14bfc931d716c801ea7e250965ce.png?resize=1600x1200&vertical=center"),
-                              ),
-                              SizedBox(width: 10.w),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Plumber",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("1000+ service provided"),
-                                ],
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 15.h),
-                        ],
-                      );
-                    }),
-              ],
-            )
           ],
         ),
       ),
     );
   }
 
-  AppBar _appBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: Row(
         children: [
@@ -173,34 +51,154 @@ class _SearchPageState extends State<SearchPage> {
           SizedBox(width: 5.w),
           AnimatedTextKit(
             animatedTexts: [
-              FadeAnimatedText(
-                "Services",
-                textStyle: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
-                duration: const Duration(seconds: 3),
-              ),
-              FadeAnimatedText(
-                "Service Provider",
-                textStyle: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
-                duration: const Duration(seconds: 3),
-              ),
-              FadeAnimatedText(
-                "Price",
-                textStyle: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
-                duration: const Duration(seconds: 3),
-              ),
+              _buildAnimatedText("Services"),
+              _buildAnimatedText("Service Provider"),
+              _buildAnimatedText("Price"),
             ],
             repeatForever: true,
-          )
+          ),
         ],
+      ),
+    );
+  }
+
+  FadeAnimatedText _buildAnimatedText(String text) {
+    return FadeAnimatedText(
+      text,
+      textStyle: Theme.of(context)
+          .textTheme
+          .bodyLarge!
+          .copyWith(fontWeight: FontWeight.bold),
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
+      child: TextFormField(
+        textInputAction: TextInputAction.done,
+        style: Theme.of(context)
+            .textTheme
+            .bodyLarge!
+            .copyWith(fontWeight: FontWeight.w500),
+        maxLines: null,
+        decoration: InputDecoration(
+          prefixIcon: const Icon(Iconsax.search_normal_1),
+          filled: true,
+          hintText: "Search for anything",
+          fillColor: Colors.grey.withOpacity(0.1),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required int itemCount,
+    required Widget Function(BuildContext, int) itemBuilder,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: itemCount,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          itemBuilder: itemBuilder,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPersonTile() {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ProviderProfile(),
+          ),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _buildProfileImage(
+                "https://cdn.dribbble.com/users/6477965/screenshots/20111844/media/c7df4e1b8e3966abe967c8aa916eba86.jpg",
+              ),
+              SizedBox(width: 10.w),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Credence Anderson",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text("Plumber"),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 15.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceTile() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildProfileImage(
+              "https://cdn.dribbble.com/userupload/16281153/file/original-b6ff14bfc931d716c801ea7e250965ce.png?resize=1600x1200&vertical=center",
+            ),
+            SizedBox(width: 10.w),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Plumber",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text("1000+ service provided"),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: 15.h),
+      ],
+    );
+  }
+
+  Widget _buildProfileImage(String imageUrl) {
+    return ClipOval(
+      child: CachedNetworkImage(
+        height: 50.h,
+        width: 50.h,
+        fit: BoxFit.cover,
+        imageUrl: imageUrl,
       ),
     );
   }

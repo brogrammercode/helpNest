@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
 
-class ServiceMainPage extends StatefulWidget {
-  const ServiceMainPage({super.key});
+class ServiceProviderList extends StatefulWidget {
+  final String category;
+
+  const ServiceProviderList({super.key, required this.category});
 
   @override
-  State<ServiceMainPage> createState() => _ServiceMainPageState();
+  State<ServiceProviderList> createState() => _ServiceProviderListState();
 }
 
-class _ServiceMainPageState extends State<ServiceMainPage> {
+class _ServiceProviderListState extends State<ServiceProviderList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Services",
+          widget.category, // Dynamic title based on the category
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
@@ -25,26 +27,25 @@ class _ServiceMainPageState extends State<ServiceMainPage> {
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHorizontalScroll(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              child: const Text(
+                "A plumber is a skilled tradesperson who specializes in the installation, maintenance, and repair of pipes, fixtures, and appliances used to distribute water, gas, and waste in residential, commercial, and industrial settings.",
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+              ),
+            ),
+            _buildSection(
+              title: "Service Provider Near You",
+              itemCount: 5,
+              itemBuilder: (context, index) => _buildPersonTile(index != 4),
+            ),
             SizedBox(height: 20.h),
             _buildSection(
-              title: "Suggested for you",
-              itemCount: 2,
-              itemBuilder: (context, index) => _buildPersonTile(index != 1),
-            ),
-            _buildSection(
               title: "Top Plumbers",
-              itemCount: 3,
-              itemBuilder: (context, index) => _buildPersonTile(index != 2),
-            ),
-            _buildSection(
-              title: "Top Carpenters",
-              itemCount: 3,
-              itemBuilder: (context, index) => _buildPersonTile(index != 2),
-            ),
-            _buildSection(
-              title: "Top Painters",
               itemCount: 3,
               itemBuilder: (context, index) => _buildPersonTile(index != 2),
             ),
@@ -79,7 +80,6 @@ class _ServiceMainPageState extends State<ServiceMainPage> {
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           itemBuilder: itemBuilder,
         ),
-        SizedBox(height: 20.h)
       ],
     );
   }
@@ -112,7 +112,7 @@ class _ServiceMainPageState extends State<ServiceMainPage> {
                       "Credence Anderson",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text("Plumber"),
+                    Text("Plumber\t\t\t\t\t4.7 ★"),
                   ],
                 ),
               ),
@@ -135,6 +135,16 @@ class _ServiceMainPageState extends State<ServiceMainPage> {
               )
             ],
           ),
+          SizedBox(height: 20.h),
+          const Text("Last Location",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 5.h),
+          const Text(
+              "Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016"),
+          if (showDivider) ...[
+            SizedBox(height: 20.h),
+            Divider(color: Colors.grey.withOpacity(.3)),
+          ],
           SizedBox(height: 15.h),
         ],
       ),

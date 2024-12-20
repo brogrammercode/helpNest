@@ -37,14 +37,15 @@ class _HomeControllerState extends State<HomeController> {
             icon: Iconsax.home,
             index: 0,
           ),
+          
           _buildBottomNavButton(
             context,
-            icon: Iconsax.search_normal_1,
+            icon: Iconsax.briefcase,
             index: 1,
           ),
           _buildBottomNavButton(
             context,
-            icon: Iconsax.briefcase,
+            icon: Iconsax.search_normal_1,
             index: 2,
           ),
           _buildBottomNavButton(
@@ -92,9 +93,9 @@ class _HomeControllerState extends State<HomeController> {
       case 0:
         return const HomeScreen();
       case 1:
-        return const SearchPage();
-      case 2:
         return const ServiceMainPage();
+      case 2:
+        return const SearchPage();
       case 3:
         return const HistoryPage();
       case 4:

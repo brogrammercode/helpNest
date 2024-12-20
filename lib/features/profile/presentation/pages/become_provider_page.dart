@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/core/utils/common_widgets.dart';
 
-class SendFeedbackPage extends StatefulWidget {
-  const SendFeedbackPage({super.key});
+class BecomeProviderPage extends StatefulWidget {
+  const BecomeProviderPage({super.key});
 
   @override
-  State<SendFeedbackPage> createState() => _SendFeedbackPageState();
+  State<BecomeProviderPage> createState() => _BecomeProviderPageState();
 }
 
-class _SendFeedbackPageState extends State<SendFeedbackPage> {
-  final titleController = TextEditingController();
-  final descriptionController = TextEditingController();
+class _BecomeProviderPageState extends State<BecomeProviderPage> {
+  final TextEditingController serviceController = TextEditingController();
+  String selectedService = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Send Feedback",
+          "Become a Service Provider",
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
@@ -29,9 +29,11 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
       floatingActionButton: Padding(
         padding: EdgeInsets.symmetric(vertical: 20.h),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            // Handle verification request
+          },
           child: Text(
-            "Submit Feedback",
+            "Request Verification",
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium!
@@ -41,18 +43,14 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
           child: Column(
             children: [
-              SizedBox(height: 10.h),
               CustomTextFormField(
-                  labelText: "Enter Title", controller: titleController),
-              SizedBox(height: 10.h),
-              CustomTextFormField(
-                  labelText: "Enter Description",
-                  controller: descriptionController,
-                  maxLines: 10,
-                  minLines: 3),
+                labelText: "Select Service",
+                controller: serviceController,
+                keyboardType: TextInputType.text,
+              ),
             ],
           ),
         ),

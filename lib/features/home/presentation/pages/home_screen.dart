@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/features/service/presentation/pages/service_provider_list.dart';
 import 'package:iconsax/iconsax.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -74,7 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
           "https://cdn.dribbble.com/userupload/11053099/file/original-e98e2d290e832cf1bc654e5eb86be778.png?resize=1600x1200&vertical=center",
       placeholder: (context, url) => SizedBox(
         height: 200.h,
-        child: const Center(child: CircularProgressIndicator()),
+        child: const Center(
+            child: CircularProgressIndicator(
+          strokeWidth: 2,
+        )),
       ),
       errorWidget: (context, url, error) => Icon(Icons.error, size: 50.w),
     );
@@ -93,15 +97,24 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       itemBuilder: (context, index) {
         return _buildServiceItem("Plumber",
-            "https://cdn.dribbble.com/userupload/16782566/file/original-a1e8dab093cbde95aa248729ef505ae8.png?resize=1200x900&vertical=center");
+            "https://cdn.dribbble.com/userupload/16782566/file/original-a1e8dab093cbde95aa248729ef505ae8.png?resize=1200x900&vertical=center",
+            () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const ServiceProviderList(
+                        category: 'Plumber',
+                      )));
+        });
       },
     );
   }
 
   /// Builds an individual service item for the grid.
-  Widget _buildServiceItem(String title, String imageUrl) {
+  Widget _buildServiceItem(
+      String title, String imageUrl, Function() onPressed) {
     return IconButton(
-      onPressed: () {},
+      onPressed: onPressed,
       icon: Column(
         children: [
           ClipOval(
@@ -113,7 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
               placeholder: (context, url) => SizedBox(
                 height: 60.h,
                 width: 60.h,
-                child: const Center(child: CircularProgressIndicator()),
+                child: const Center(
+                    child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                )),
               ),
               errorWidget: (context, url, error) =>
                   Icon(Icons.error, size: 40.w),
@@ -181,7 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
           placeholder: (context, url) => SizedBox(
             height: 250.h,
             width: 350.w,
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(
+                child: CircularProgressIndicator(
+              strokeWidth: 2,
+            )),
           ),
           errorWidget: (context, url, error) => Icon(Icons.error, size: 50.w),
         ),

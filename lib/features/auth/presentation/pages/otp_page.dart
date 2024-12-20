@@ -9,51 +9,55 @@ class OtpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Center(child: SizedBox(height: 70.h)),
-          Text(
-            "Verify Phone",
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall!
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.h),
-          Text(
-            "Code has been sent to +916204254184",
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 30.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40.w),
-            child: const Pinput(length: 6),
-          ),
-          SizedBox(height: 30.h),
-          Text(
-            "Didn't get OTP Code ?",
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-          TextButton(
-            onPressed: () {},
-            child: Text(
-              "Resend Code",
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 70.h),
+            Text(
+              "Verify Phone",
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall!
+                  .copyWith(fontWeight: FontWeight.bold),
             ),
-          ),
-          Expanded(child: SizedBox(height: 10.h)),
-          ElevatedButton(
+            SizedBox(height: 10.h),
+            Text(
+              "Code has been sent to +916204254184",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 30.h),
+            const Pinput(length: 6),
+            SizedBox(height: 30.h),
+            Text(
+              "Didn't get OTP Code?",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                "Resend Code",
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
+              ),
+            ),
+            const Spacer(),
+            ElevatedButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                );
               },
               child: Text(
                 "Continue",
@@ -61,9 +65,11 @@ class OtpPage extends StatelessWidget {
                     .textTheme
                     .bodyMedium!
                     .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-              )),
-          SizedBox(height: 20.h),
-        ],
+              ),
+            ),
+            SizedBox(height: 20.h),
+          ],
+        ),
       ),
     );
   }

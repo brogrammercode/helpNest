@@ -10,7 +10,7 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  final List onboarding = [
+  final List<List<String>> onboarding = [
     [
       "Find Services\nwith Ease",
       "Browse and connect with trusted service providers tailored to your needs."
@@ -25,10 +25,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
     ]
   ];
   bool skipped = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appBar(context),
+      appBar: _buildAppBar(context),
       body: Column(
         children: [
           SizedBox(height: 50.h),
@@ -56,63 +57,64 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ),
           SizedBox(height: 50.h),
           ElevatedButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const PhoneInputPage()));
-              },
-              child: Text(
-                skipped ? "Log in with Phone" : "Continue",
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-              )),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PhoneInputPage()),
+              );
+            },
+            child: Text(
+              skipped ? "Log in with Phone" : "Continue",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
           SizedBox(height: 70.h),
         ],
       ),
     );
   }
 
-  AppBar _appBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            height: 7.h,
-            width: 7.h,
-            margin: EdgeInsets.only(right: 7.w),
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(.1),
-                borderRadius: BorderRadius.circular(30)),
-          ),
-          Container(
-            height: 7.h,
-            width: 30.w,
-            margin: EdgeInsets.only(right: 7.w),
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(30)),
-          ),
-          Container(
-            height: 7.h,
-            width: 7.h,
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(.1),
-                borderRadius: BorderRadius.circular(30)),
-          ),
+          _buildIndicator(context, active: false),
+          SizedBox(width: 7.w),
+          _buildIndicator(context, active: true, width: 30.w),
+          SizedBox(width: 7.w),
+          _buildIndicator(context, active: false),
         ],
       ),
       actions: [
         TextButton(
-            onPressed: () {},
-            child: Text(
-              "Skip",
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+          onPressed: () {},
+          child: Text(
+            "Skip",
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold),
-            ))
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        )
       ],
+    );
+  }
+
+  Widget _buildIndicator(BuildContext context,
+      {required bool active, double width = 7.0}) {
+    return Container(
+      height: 7.h,
+      width: width.h,
+      decoration: BoxDecoration(
+        color: active
+            ? Theme.of(context).primaryColor
+            : Theme.of(context).primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(30),
+      ),
     );
   }
 }

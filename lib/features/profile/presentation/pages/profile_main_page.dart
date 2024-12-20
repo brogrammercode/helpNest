@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/profile/presentation/pages/about_page.dart';
+import 'package:helpnest/features/profile/presentation/pages/become_provider_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/privacy_policy.dart';
 import 'package:helpnest/features/profile/presentation/pages/send_feedback_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/support_page.dart';
@@ -33,7 +34,10 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             _buildListTile(
               icon: Iconsax.briefcase,
               title: "Become a Service Provider",
-              onTap: () {}, // Add navigation logic
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BecomeProviderPage()),
+              ),
             ),
             _buildListTile(
               icon: Iconsax.info_circle,

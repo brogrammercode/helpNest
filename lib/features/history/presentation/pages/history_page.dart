@@ -80,21 +80,27 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text(
-        "Order History",
-        style: Theme.of(context)
-            .textTheme
-            .bodyLarge!
-            .copyWith(fontWeight: FontWeight.bold),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Iconsax.notification),
-          tooltip: "Notifications",
+    return PreferredSize(
+      preferredSize: const Size(double.infinity, kToolbarHeight),
+      child: Padding(
+        padding: EdgeInsets.only(right: 15.w),
+        child: AppBar(
+          title: Text(
+            "Order History",
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Iconsax.notification),
+              tooltip: "Notifications",
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -145,7 +151,9 @@ class OrderCard extends StatelessWidget {
                     width: 50.h,
                     fit: BoxFit.cover,
                     imageUrl: imageUrl,
-                    placeholder: (_, __) => const CircularProgressIndicator(),
+                    placeholder: (_, __) => const CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
                     errorWidget: (_, __, ___) =>
                         const Icon(Icons.error, color: Colors.red),
                   ),
