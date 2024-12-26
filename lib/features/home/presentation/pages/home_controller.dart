@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:helpnest/features/history/presentation/pages/history_page.dart';
+import 'package:helpnest/features/order/presentation/pages/history_page.dart';
 import 'package:helpnest/features/home/presentation/pages/home_screen.dart';
 import 'package:helpnest/features/profile/presentation/pages/profile_main_page.dart';
 import 'package:helpnest/features/search/presentation/pages/search_page.dart';
@@ -37,7 +37,6 @@ class _HomeControllerState extends State<HomeController> {
             icon: Iconsax.home,
             index: 0,
           ),
-          
           _buildBottomNavButton(
             context,
             icon: Iconsax.briefcase,
