@@ -29,7 +29,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             _buildListTile(
               icon: Iconsax.frame_1,
               title: "Your Profile",
-              onTap: () {}, // Add navigation logic
+              onTap: () async {}, 
             ),
             _buildListTile(
               icon: Iconsax.briefcase,
@@ -58,7 +58,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const SendFeedbackPage()),
-              ), 
+              ),
             ),
             _buildListTile(
               icon: Iconsax.more_circle,
@@ -66,7 +66,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const AboutPage()),
-              ), 
+              ),
             ),
             _buildListTile(
               icon: Iconsax.shield_tick,

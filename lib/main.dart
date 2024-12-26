@@ -6,6 +6,7 @@ import 'package:helpnest/core/config/theme.dart';
 import 'package:helpnest/features/home/presentation/pages/home_controller.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const App());
 }

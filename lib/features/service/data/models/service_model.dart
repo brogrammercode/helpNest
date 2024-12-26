@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:helpnest/features/service/domain/entities/service_entity.dart';
 
 class ServiceModel extends ServiceEntity {
@@ -20,10 +21,10 @@ class ServiceModel extends ServiceEntity {
       name: json['name'] ?? '',
       logo: json['logo'] ?? '',
       description: json['description'] ?? '',
-      creationTD: json['creationTD'] ?? '',
+      creationTD: json['creationTD'] ?? Timestamp.now(),
       createdBy: json['createdBy'] ?? '',
       deactivate: json['deactivate'] ?? false,
-      avgCharge: json['avgCharge'] ?? '',
+      avgCharge: json['avgCharge'] ?? 0,
       avgTime: json['avgTime'] ?? '',
       slides: json['slides'] ?? [],
     );
@@ -54,10 +55,10 @@ class ServiceModel extends ServiceEntity {
     String? name,
     String? logo,
     String? description,
-    String? creationTD,
+    Timestamp? creationTD,
     String? createdBy,
     bool? deactivate,
-    String? avgCharge,
+    num? avgCharge,
     String? avgTime,
     List? slides,
   }) {

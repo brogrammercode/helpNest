@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ServiceEntity {
   final String id;
   final String name;
   final String logo;
   final String description;
-  final String creationTD;
+  final Timestamp creationTD;
   final String createdBy;
   final bool deactivate;
-  final String avgCharge;
+  final num avgCharge;
   final String avgTime;
   final List slides;
 
