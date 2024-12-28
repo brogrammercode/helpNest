@@ -30,6 +30,8 @@ class ServiceProviderModel extends ServiceProviderEntity {
     );
   }
 
+  get name => null;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
