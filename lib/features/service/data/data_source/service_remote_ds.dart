@@ -31,4 +31,32 @@ class ServiceRemoteDs implements ServiceRepo {
       return [];
     }
   }
+
+  @override
+  Future<void> deleteService({required List<ServiceModel> service}) async {
+    try {
+      for (var s in service) {
+        await FirebaseFirestore.instance
+            .collection("services")
+            .doc(s.id)
+            .delete();
+        debugPrint("Deleted service with ID: ${s.id}");
+      }
+    } catch (e) {
+      debugPrint("SERVICE_REMOTE_DS_DELETE_SERVICE_ERROR: $e");
+    }
+  }
+
+  @override
+  Future<void> updateService({required ServiceModel service}) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("services")
+          .doc(service.id)
+          .update(service.toJson());
+      debugPrint("Updated service with ID: ${service.id}");
+    } catch (e) {
+      debugPrint("SERVICE_REMOTE_DS_UPDATE_SERVICE_ERROR: $e");
+    }
+  }
 }
