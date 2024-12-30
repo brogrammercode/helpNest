@@ -1,6 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/features/profile/presentation/pages/about_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/become_provider_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/privacy_policy.dart';
@@ -29,7 +34,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             _buildListTile(
               icon: Iconsax.frame_1,
               title: "Your Profile",
-              onTap: () async {}, 
+              onTap: () async {},
             ),
             _buildListTile(
               icon: Iconsax.briefcase,
@@ -87,7 +92,12 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             _buildListTile(
               icon: Iconsax.unlock,
               title: "Log out",
-              onTap: () {}, // Add logout logic
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                await GoogleSignIn().signOut();
+                Navigator.pushReplacementNamed(
+                    context, AppRoutes.onboardingPage);
+              }, 
             ),
           ],
         ),

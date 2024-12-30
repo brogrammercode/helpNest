@@ -5,5 +5,5 @@ abstract class ServiceRepo {
   Future<List<ServiceModel>> getServices();
   Future<void> addService({required ServiceModel service});
   Future<void> deleteService({required List<ServiceModel> service});
-  Future<ServiceModel> updateService({required ServiceModel service});
+  Future<void> updateService({required ServiceModel service});
 }

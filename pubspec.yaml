@@ -33,12 +33,16 @@ dependencies:
   carousel_slider: ^5.0.0
   cloud_firestore: ^5.6.0
   cupertino_icons: ^1.0.8
+  equatable: ^2.0.7
   firebase_auth: ^5.3.4
   firebase_core: ^3.9.0
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.6
   flutter_screenutil: ^5.9.3
+  get_it: ^8.0.3
   google_fonts: ^6.2.1
+  google_sign_in: ^6.2.2
   iconsax: ^0.0.8
   pinput: ^5.0.0
 
