@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,6 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   ];
   bool skipped = false;
   int headingIndex = 0;
+  int imageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +74,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               .headlineLarge!
                               .copyWith(fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
-                          duration: const Duration(milliseconds: 3000)
-                      ),
+                          duration: const Duration(milliseconds: 3000)),
                       FadeAnimatedText(
                         onboarding[1][0],
                         textStyle: Theme.of(context)
@@ -97,7 +98,25 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     repeatForever: true,
                   ),
                 ),
-                SizedBox(height: 450.h),
+                SizedBox(
+                  height: 450.h,
+                  width: double.infinity,
+                  child: CarouselSlider(
+                    items: List.generate(
+                        6,
+                        (index) =>
+                            Image.asset("assets/auth/onb${index + 1}.png")),
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 2),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.easeInOut,
+                      enlargeCenterPage: true,
+                      viewportFraction: 0.8,
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40.w),
                   child: Text(

@@ -1,47 +1,122 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
+import 'package:helpnest/features/profile/data/models/emergency_model.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
 import 'package:helpnest/features/profile/data/models/service_provier_model.dart';
 import 'package:helpnest/features/profile/domain/repo/profile_repo.dart';
 
-class ProfileRemoteDs implements ServiceProviderRepo {
+class ProfileRemoteDs implements ProfileRepo {
+  final firestore = FirebaseFirestore.instance;
+
   @override
-  Future<void> addFeedback({required FeedbackModel feedback}) {
-    throw UnimplementedError();
+  Future<void> addFeedback({required FeedbackModel feedback}) async {
+    try {
+      await firestore
+          .collection('feedbacks')
+          .doc(feedback.id)
+          .set(feedback.toJson());
+    } catch (e) {
+      throw Exception('Error adding feedback: $e');
+    }
   }
 
   @override
   Stream<List<FeedbackModel>> getAppFeedback() {
-    throw UnimplementedError();
+    try {
+      return firestore
+          .collection('feedbacks')
+          .where("module", isNotEqualTo: "SERVICE PROVIDER")
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((doc) => FeedbackModel.fromJson(doc.data()))
+              .toList());
+    } catch (e) {
+      throw Exception('Error fetching feedback: $e');
+    }
   }
 
   @override
   Stream<ServiceProviderModel> getProvider() {
-    throw UnimplementedError();
+    try {
+      return firestore
+          .collection('service_providers')
+          .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+          .snapshots()
+          .map((doc) => ServiceProviderModel.fromJson(doc.data()!));
+    } catch (e) {
+      throw Exception('Error fetching provider: $e');
+    }
   }
 
   @override
   Stream<UserModel> getUser() {
-    throw UnimplementedError();
+    try {
+      return firestore
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+          .snapshots()
+          .map((doc) => UserModel.fromJson(doc.data()!));
+    } catch (e) {
+      throw Exception('Error fetching user: $e');
+    }
   }
 
   @override
-  Future<void> reportSafetyEmergency() {
-    throw UnimplementedError();
+  Future<void> reportSafetyEmergency(
+      {required EmergencyModel emergency}) async {
+    try {
+      await firestore
+          .collection('emergencies')
+          .doc(emergency.id)
+          .set(emergency.toJson());
+    } catch (e) {
+      throw Exception('Error reporting emergency: $e');
+    }
   }
 
   @override
   Future<void> requestServiceProviderAccess(
-      {required ServiceProviderModel provider}) {
-    throw UnimplementedError();
+      {required ServiceProviderModel provider}) async {
+    try {
+      await firestore
+          .collection('service_providers')
+          .doc(provider.id)
+          .set(provider.toJson());
+    } catch (e) {
+      throw Exception('Error requesting provider access: $e');
+    }
   }
 
   @override
-  Future<void> updateProvider({required ServiceProviderModel provider}) {
-    throw UnimplementedError();
+  Future<void> updateProvider({required ServiceProviderModel provider}) async {
+    try {
+      await firestore
+          .collection('service_providers')
+          .doc(provider.id)
+          .update(provider.toJson());
+    } catch (e) {
+      throw Exception('Error updating provider: $e');
+    }
   }
 
   @override
-  Future<void> updateUser({required UserModel user}) {
-    throw UnimplementedError();
+  Future<void> updateUser({required UserModel user}) async {
+    try {
+      await firestore.collection('users').doc(user.id).update(user.toJson());
+    } catch (e) {
+      throw Exception('Error updating user: $e');
+    }
+  }
+
+  @override
+  Future<void> logOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      await GoogleSignIn().signOut();
+    } catch (e) {
+      throw Exception("Couldn't log out: $e");
+    }
   }
 }

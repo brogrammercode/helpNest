@@ -1,11 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
+import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/profile/presentation/pages/about_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/become_provider_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/privacy_policy.dart';
@@ -24,84 +27,93 @@ class ProfileMainPage extends StatefulWidget {
 class _ProfileMainPageState extends State<ProfileMainPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileSection(context),
-            SizedBox(height: 30.h),
-            _buildListTile(
-              icon: Iconsax.frame_1,
-              title: "Your Profile",
-              onTap: () async {},
+    return BlocConsumer<ProfileCubit, ProfileState>(
+      listener: (context, state) {
+        if (state.error != const StateError()) {
+          log(state.error.consoleMessage);
+        } else if (state.logOutStatus == StateStatus.success) {
+          Navigator.pushReplacementNamed(context, AppRoutes.onboardingPage);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: _buildAppBar(context),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildProfileSection(context, state),
+                SizedBox(height: 30.h),
+                _buildListTile(
+                  icon: Iconsax.frame_1,
+                  title: "Your Profile",
+                  onTap: () async {},
+                ),
+                _buildListTile(
+                  icon: Iconsax.briefcase,
+                  title: "Become a Service Provider",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const BecomeProviderPage()),
+                  ),
+                ),
+                _buildListTile(
+                  icon: Iconsax.info_circle,
+                  title: "Report a Safety Emergency",
+                  onTap: () {}, // Add navigation logic
+                ),
+                _buildListTile(
+                  icon: Iconsax.support,
+                  title: "Support",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SupportPage()),
+                  ),
+                ),
+                _buildListTile(
+                  icon: Iconsax.edit_2,
+                  title: "Send Feedback",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SendFeedbackPage()),
+                  ),
+                ),
+                _buildListTile(
+                  icon: Iconsax.more_circle,
+                  title: "About",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AboutPage()),
+                  ),
+                ),
+                _buildListTile(
+                  icon: Iconsax.shield_tick,
+                  title: "Privacy Policy",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PrivacyPolicy()),
+                  ),
+                ),
+                _buildListTile(
+                  icon: Iconsax.receipt_1,
+                  title: "Terms and Conditions",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TermsCondition()),
+                  ),
+                ),
+                _buildListTile(
+                  icon: Iconsax.unlock,
+                  title: state.logOutStatus == StateStatus.loading
+                      ? "Logging out"
+                      : "Log out",
+                  onTap: () async => context.read<ProfileCubit>().logOut(),
+                ),
+              ],
             ),
-            _buildListTile(
-              icon: Iconsax.briefcase,
-              title: "Become a Service Provider",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const BecomeProviderPage()),
-              ),
-            ),
-            _buildListTile(
-              icon: Iconsax.info_circle,
-              title: "Report a Safety Emergency",
-              onTap: () {}, // Add navigation logic
-            ),
-            _buildListTile(
-              icon: Iconsax.support,
-              title: "Support",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SupportPage()),
-              ),
-            ),
-            _buildListTile(
-              icon: Iconsax.edit_2,
-              title: "Send Feedback",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SendFeedbackPage()),
-              ),
-            ),
-            _buildListTile(
-              icon: Iconsax.more_circle,
-              title: "About",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AboutPage()),
-              ),
-            ),
-            _buildListTile(
-              icon: Iconsax.shield_tick,
-              title: "Privacy Policy",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PrivacyPolicy()),
-              ),
-            ),
-            _buildListTile(
-              icon: Iconsax.receipt_1,
-              title: "Terms and Conditions",
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const TermsCondition()),
-              ),
-            ),
-            _buildListTile(
-              icon: Iconsax.unlock,
-              title: "Log out",
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                await GoogleSignIn().signOut();
-                Navigator.pushReplacementNamed(
-                    context, AppRoutes.onboardingPage);
-              }, 
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -132,44 +144,91 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
     );
   }
 
-  Widget _buildProfileSection(BuildContext context) {
-    return Column(
-      children: [
-        Center(
-          child: Container(
-            height: 135.h,
-            width: 135.h,
-            margin: EdgeInsets.all(10.h),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 10,
-                ),
-              ],
-              border: Border.all(color: Colors.white, width: 7.w),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: CachedNetworkImage(
-                height: 125.h,
-                width: 125.h,
-                fit: BoxFit.cover,
-                imageUrl:
+  Widget _buildProfileImages(
+      {required String? providerImage, required String? serviceLogo}) {
+    return Center(
+      child: SizedBox(
+        width: 200.w,
+        height: 150.h,
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _buildCircularImage(
+                serviceLogo ??
                     "https://cdn.dribbble.com/userupload/16281153/file/original-b6ff14bfc931d716c801ea7e250965ce.png?resize=1600x1200&vertical=center",
               ),
             ),
-          ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _buildCircularImage(
+                providerImage ??
+                    "https://cdn.dribbble.com/userupload/16366138/file/original-c35bbf68ba08abeb0509f09de77dd62b.jpg?resize=1600x1200&vertical=center",
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 10.h),
+      ),
+    );
+  }
+
+  Widget _buildCircularImage(String imageUrl) {
+    return Container(
+      alignment: Alignment.center,
+      height: 125.h,
+      width: 125.h,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
+        ],
+        border: Border.all(color: Colors.white, width: 7.w),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(100),
+        child: CachedNetworkImage(
+          height: 125.h,
+          width: 125.h,
+          fit: BoxFit.cover,
+          imageUrl: imageUrl,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileSection(BuildContext context, ProfileState state) {
+    return Column(
+      children: [
+        if (state.provider.isNotEmpty) ...[
+          _buildProfileImages(
+              providerImage: state.user.first.image, serviceLogo: '')
+        ] else ...[
+          SizedBox(
+            height: 135.h,
+            child: Center(
+              child: _buildCircularImage(state.user.isNotEmpty
+                  ? state.user.first.image
+                  : "helpNest User"),
+            ),
+          ),
+        ],
+        SizedBox(height: 5.h),
         Text(
-          "Credence Anderson",
+          state.user.isNotEmpty ? state.user.first.name : "helpNest User",
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
               .copyWith(fontWeight: FontWeight.bold),
         ),
+        if (state.provider.isNotEmpty) ...[
+          Text(
+            state.provider.isNotEmpty ? state.provider.first.name : "Provider",
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(fontWeight: FontWeight.w500),
+          ),
+        ],
       ],
     );
   }

@@ -7,6 +7,7 @@ import 'package:helpnest/core/config/injection.dart';
 import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/core/config/theme.dart';
 import 'package:helpnest/features/auth/presentation/cubit/auth_state.dart';
+import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,8 @@ class App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(create: (_) => Injections.get<AuthCubit>()),
+        BlocProvider<ProfileCubit>(
+            create: (_) => Injections.get<ProfileCubit>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(411.42857142857144, 843.4285714285714),
