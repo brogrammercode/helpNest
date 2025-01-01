@@ -5,10 +5,11 @@ class ServiceProviderModel extends ServiceProviderEntity {
   ServiceProviderModel({
     required super.id,
     required super.aadharCardImageURL,
+    required super.panCardImageURL,
     required super.status,
     required super.approvedTD,
     required super.approvedBy,
-    required super.services,
+    required super.serviceID,
     required super.experienceDocImageURL,
     required super.creationTD,
     required super.createdBy,
@@ -19,10 +20,11 @@ class ServiceProviderModel extends ServiceProviderEntity {
     return ServiceProviderModel(
       id: json['id'] ?? '',
       aadharCardImageURL: json['aadharCardImageURL'] ?? '',
+      panCardImageURL: json['panCardImageURL'] ?? '',
       status: json['status'] ?? '',
       approvedTD: json['approvedTD'] ?? '',
       approvedBy: json['approvedBy'] ?? '',
-      services: json['services'] ?? [],
+      serviceID: json['serviceID'] ?? "",
       experienceDocImageURL: json['experienceDocImageURL'] ?? '',
       creationTD: json['creationTD'] ?? Timestamp.now(),
       createdBy: json['createdBy'] ?? '',
@@ -30,16 +32,16 @@ class ServiceProviderModel extends ServiceProviderEntity {
     );
   }
 
-  get name => null;
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'aadharCardImageURL': aadharCardImageURL,
+      'panCardImageURL': panCardImageURL,
       'status': status,
       'approvedTD': approvedTD,
       'approvedBy': approvedBy,
-      'services': services,
+      'serviceID': serviceID,
       'experienceDocImageURL': experienceDocImageURL,
       'creationTD': creationTD,
       'createdBy': createdBy,
@@ -49,16 +51,17 @@ class ServiceProviderModel extends ServiceProviderEntity {
 
   @override
   String toString() {
-    return 'ServiceProviderModel(id: $id, aadharCardImageURL: $aadharCardImageURL, status: $status, approvedTD: $approvedTD, approvedBy: $approvedBy, services: $services, experienceDocImageURL: $experienceDocImageURL, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
+    return 'ServiceProviderModel(id: $id, aadharCardImageURL: $aadharCardImageURL, status: $status, approvedTD: $approvedTD, approvedBy: $approvedBy, serviceID: $serviceID, experienceDocImageURL: $experienceDocImageURL, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
   }
 
   ServiceProviderModel copyWith({
     String? id,
     String? aadharCardImageURL,
+    String? panCardImageURL,
     String? status,
-    String? approvedTD,
+    Timestamp? approvedTD,
     String? approvedBy,
-    List? services,
+    String? serviceID,
     String? experienceDocImageURL,
     Timestamp? creationTD,
     String? createdBy,
@@ -67,10 +70,11 @@ class ServiceProviderModel extends ServiceProviderEntity {
     return ServiceProviderModel(
       id: id ?? this.id,
       aadharCardImageURL: aadharCardImageURL ?? this.aadharCardImageURL,
+      panCardImageURL: panCardImageURL ?? this.panCardImageURL,
       status: status ?? this.status,
       approvedTD: approvedTD ?? this.approvedTD,
       approvedBy: approvedBy ?? this.approvedBy,
-      services: services ?? this.services,
+      serviceID: serviceID ?? this.serviceID,
       experienceDocImageURL:
           experienceDocImageURL ?? this.experienceDocImageURL,
       creationTD: creationTD ?? this.creationTD,

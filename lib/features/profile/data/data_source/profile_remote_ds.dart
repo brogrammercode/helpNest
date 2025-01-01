@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/profile/data/models/emergency_model.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
@@ -77,9 +80,40 @@ class ProfileRemoteDs implements ProfileRepo {
   }
 
   @override
-  Future<void> requestServiceProviderAccess(
-      {required ServiceProviderModel provider}) async {
+  Future<void> requestServiceProviderAccess({
+    required ServiceProviderModel provider,
+    required File? aadhar,
+    required File? pan,
+    required File? experience,
+  }) async {
     try {
+      String? aadharUrl;
+      String? panUrl;
+      String? experienceUrl;
+      if (aadhar != null) {
+        aadharUrl = await uploadFileAndGetUrl(
+          file: aadhar,
+          path: "${FirebaseAuth.instance.currentUser?.uid}/profile/aadhar.jpg",
+        );
+      }
+      if (pan != null) {
+        panUrl = await uploadFileAndGetUrl(
+          file: pan,
+          path: "${FirebaseAuth.instance.currentUser?.uid}/profile/pan.jpg",
+        );
+      }
+      if (experience != null) {
+        experienceUrl = await uploadFileAndGetUrl(
+          file: experience,
+          path:
+              "${FirebaseAuth.instance.currentUser?.uid}/profile/experience.jpg",
+        );
+      }
+      provider = provider.copyWith(
+        aadharCardImageURL: aadharUrl,
+        panCardImageURL: panUrl,
+        experienceDocImageURL: experienceUrl,
+      );
       await firestore
           .collection('service_providers')
           .doc(provider.id)

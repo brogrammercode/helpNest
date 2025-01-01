@@ -9,7 +9,8 @@ class OrderEntity {
   final String serviceID;
   final String orderTD;
   final String completionTD;
-  final UserLocationModel location;
+  final UserLocationModel consumerLocation;
+  final UserLocationModel providerLocation;
   final FeedbackModel feedback;
   final String orderFee;
   final String trackingPolylinePoints;
@@ -24,7 +25,8 @@ class OrderEntity {
       required this.serviceID,
       required this.orderTD,
       required this.completionTD,
-      required this.location,
+      required this.consumerLocation,
+      required this.providerLocation,
       required this.feedback,
       required this.orderFee,
       required this.trackingPolylinePoints,

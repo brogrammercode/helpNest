@@ -9,12 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
-import 'package:helpnest/features/profile/presentation/pages/about_page.dart';
-import 'package:helpnest/features/profile/presentation/pages/become_provider_page.dart';
-import 'package:helpnest/features/profile/presentation/pages/privacy_policy.dart';
-import 'package:helpnest/features/profile/presentation/pages/send_feedback_page.dart';
-import 'package:helpnest/features/profile/presentation/pages/support_page.dart';
-import 'package:helpnest/features/profile/presentation/pages/terms_condition.dart';
+import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ProfileMainPage extends StatefulWidget {
@@ -29,7 +24,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        if (state.error != const StateError()) {
+        if (state.error != const CommonError()) {
           log(state.error.consoleMessage);
         } else if (state.logOutStatus == StateStatus.success) {
           Navigator.pushReplacementNamed(context, AppRoutes.onboardingPage);
@@ -51,56 +46,46 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                 _buildListTile(
                   icon: Iconsax.briefcase,
                   title: "Become a Service Provider",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const BecomeProviderPage()),
-                  ),
+                  onTap: () => Navigator.pushNamed(
+                      context,
+                      state.provider.isNotEmpty
+                          ? AppRoutes.becomeProviderStatusPage
+                          : AppRoutes.becomeProviderPage),
                 ),
                 _buildListTile(
                   icon: Iconsax.info_circle,
                   title: "Report a Safety Emergency",
-                  onTap: () {}, // Add navigation logic
+                  onTap: () {},
                 ),
                 _buildListTile(
                   icon: Iconsax.support,
                   title: "Support",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SupportPage()),
-                  ),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.supportPage),
                 ),
                 _buildListTile(
                   icon: Iconsax.edit_2,
                   title: "Send Feedback",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SendFeedbackPage()),
-                  ),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.sendFeedbackPage),
                 ),
                 _buildListTile(
                   icon: Iconsax.more_circle,
                   title: "About",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AboutPage()),
-                  ),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.aboutPage),
                 ),
                 _buildListTile(
                   icon: Iconsax.shield_tick,
                   title: "Privacy Policy",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PrivacyPolicy()),
-                  ),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.privacyPolicy),
                 ),
                 _buildListTile(
                   icon: Iconsax.receipt_1,
                   title: "Terms and Conditions",
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const TermsCondition()),
-                  ),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.termsCondition),
                 ),
                 _buildListTile(
                   icon: Iconsax.unlock,
@@ -190,6 +175,10 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
           height: 125.h,
           width: 125.h,
           fit: BoxFit.cover,
+          errorWidget: (c, u, e) {
+            log("CACHED_IMAGE_ERROR: $e");
+            return const Icon(Iconsax.gallery);
+          },
           imageUrl: imageUrl,
         ),
       ),
@@ -201,7 +190,14 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
       children: [
         if (state.provider.isNotEmpty) ...[
           _buildProfileImages(
-              providerImage: state.user.first.image, serviceLogo: '')
+              providerImage: state.user.first.image,
+              serviceLogo: context
+                  .read<ServiceCubit>()
+                  .state
+                  .services
+                  .where((e) => e.id == state.provider.first.serviceID)
+                  .first
+                  .logo)
         ] else ...[
           SizedBox(
             height: 135.h,
@@ -222,7 +218,15 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
         ),
         if (state.provider.isNotEmpty) ...[
           Text(
-            state.provider.isNotEmpty ? state.provider.first.name : "Provider",
+            state.provider.isNotEmpty
+                ? context
+                    .read<ServiceCubit>()
+                    .state
+                    .services
+                    .where((e) => e.id == state.provider.first.serviceID)
+                    .first
+                    .name
+                : "Provider",
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium!

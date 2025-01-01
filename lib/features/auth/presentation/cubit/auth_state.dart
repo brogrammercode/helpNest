@@ -6,16 +6,16 @@ import 'package:helpnest/features/auth/domain/repo/auth_repo.dart';
 part 'auth_cubit.dart';
 
 class AuthState extends Equatable {
-  final StateError error;
+  final CommonError error;
   final StateStatus status;
 
   const AuthState({
-    this.error = const StateError(),
+    this.error = const CommonError(),
     this.status = StateStatus.initial,
   });
 
   AuthState copyWith({
-    StateError? error,
+    CommonError? error,
     StateStatus? status,
   }) {
     return AuthState(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -16,7 +17,7 @@ class ProfileState extends Equatable {
   final List<UserModel> user;
   final List<ServiceProviderModel> provider;
   final List<FeedbackModel> appFeedbacks;
-  final StateError error;
+  final CommonError error;
   final GeoPoint currentLocation;
   final StateStatus addFeedbackStatus;
   final StateStatus getAppFeedbackStatus;
@@ -32,7 +33,7 @@ class ProfileState extends Equatable {
     this.user = const [],
     this.provider = const [],
     this.appFeedbacks = const [],
-    this.error = const StateError(),
+    this.error = const CommonError(),
     this.currentLocation = const GeoPoint(0, 0),
     this.addFeedbackStatus = StateStatus.initial,
     this.getAppFeedbackStatus = StateStatus.initial,
@@ -49,7 +50,7 @@ class ProfileState extends Equatable {
     List<UserModel>? user,
     List<ServiceProviderModel>? provider,
     List<FeedbackModel>? appFeedbacks,
-    StateError? error,
+    CommonError? error,
     GeoPoint? currentLocation,
     StateStatus? addFeedbackStatus,
     StateStatus? getAppFeedbackStatus,

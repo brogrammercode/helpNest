@@ -32,7 +32,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           getUserStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -47,7 +47,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           getProviderStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -63,7 +63,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           getAppFeedbackStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -76,7 +76,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           addFeedbackStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -89,7 +89,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           reportSafetyEmergencyStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -102,7 +102,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           updateUserStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -115,7 +115,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           updateProviderStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
@@ -128,23 +128,25 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           logOutStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 
   Future<void> requestServiceProviderAccess(
-      ServiceProviderModel provider) async {
+      ServiceProviderModel provider,
+      File? aadhar, File? pan, File? experience) async {
     try {
       emit(state.copyWith(
           requestServiceProviderAccessStatus: StateStatus.loading));
 
-      await _repo.requestServiceProviderAccess(provider: provider);
+      await _repo.requestServiceProviderAccess(
+          provider: provider, aadhar: aadhar, pan: pan, experience: experience);
       emit(state.copyWith(
           requestServiceProviderAccessStatus: StateStatus.success));
     } catch (e) {
       emit(state.copyWith(
           requestServiceProviderAccessStatus: StateStatus.failure,
-          error: StateError(consoleMessage: e.toString())));
+          error: CommonError(consoleMessage: e.toString())));
     }
   }
 }

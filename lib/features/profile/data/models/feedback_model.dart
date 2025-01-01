@@ -5,10 +5,10 @@ class FeedbackModel extends FeedbackEntity {
   FeedbackModel({
     required super.id,
     required super.rating,
-    required super.module,
-    required super.category,
-    required super.title,
-    required super.description,
+    required super.module, // Profile
+    required super.category, // Service Provider Feedback
+    required super.title, // uid of the provider
+    required super.description, // desc
     required super.creationTD,
     required super.createdBy,
     required super.deactivate,

@@ -11,7 +11,8 @@ class OrderModel extends OrderEntity {
     required super.serviceID,
     required super.orderTD,
     required super.completionTD,
-    required super.location,
+    required super.consumerLocation,
+    required super.providerLocation,
     required super.feedback,
     required super.orderFee,
     required super.trackingPolylinePoints,
@@ -28,7 +29,10 @@ class OrderModel extends OrderEntity {
       serviceID: json['serviceID'] ?? '',
       orderTD: json['orderTD'] ?? '',
       completionTD: json['completionTD'] ?? '',
-      location: UserLocationModel.fromJson(json['location'] ?? {}),
+      consumerLocation:
+          UserLocationModel.fromJson(json['consumerLocation'] ?? {}),
+      providerLocation:
+          UserLocationModel.fromJson(json['providerLocation'] ?? {}),
       feedback: FeedbackModel.fromJson(json['feedback'] ?? {}),
       orderFee: json['orderFee'] ?? '',
       trackingPolylinePoints: json['trackingPolylinePoints'] ?? '',
@@ -46,7 +50,8 @@ class OrderModel extends OrderEntity {
       'serviceID': serviceID,
       'orderTD': orderTD,
       'completionTD': completionTD,
-      'location': location.toJson(),
+      'consumerLocation': consumerLocation.toJson(),
+      'providerLocation': providerLocation.toJson(),
       'feedback': feedback.toJson(),
       'orderFee': orderFee,
       'trackingPolylinePoints': trackingPolylinePoints,
@@ -58,7 +63,7 @@ class OrderModel extends OrderEntity {
 
   @override
   String toString() {
-    return 'OrderModel(id: $id, consumerID: $consumerID, providerID: $providerID, serviceID: $serviceID, orderTD: $orderTD, completionTD: $completionTD, location: $location, feedback: $feedback, orderFee: $orderFee, trackingPolylinePoints: $trackingPolylinePoints, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
+    return 'OrderModel(id: $id, consumerID: $consumerID, providerID: $providerID, serviceID: $serviceID, orderTD: $orderTD, completionTD: $completionTD, consumerLocation: $consumerLocation, providerLocation: $providerLocation, feedback: $feedback, orderFee: $orderFee, trackingPolylinePoints: $trackingPolylinePoints, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
   }
 
   OrderModel copyWith({
@@ -68,7 +73,8 @@ class OrderModel extends OrderEntity {
     String? serviceID,
     String? orderTD,
     String? completionTD,
-    UserLocationModel? location,
+    UserLocationModel? consumerLocation,
+    UserLocationModel? providerLocation,
     FeedbackModel? feedback,
     String? orderFee,
     String? trackingPolylinePoints,
@@ -83,7 +89,8 @@ class OrderModel extends OrderEntity {
       serviceID: serviceID ?? this.serviceID,
       orderTD: orderTD ?? this.orderTD,
       completionTD: completionTD ?? this.completionTD,
-      location: location ?? this.location,
+      consumerLocation: consumerLocation ?? this.consumerLocation,
+      providerLocation: providerLocation ?? this.providerLocation,
       feedback: feedback ?? this.feedback,
       orderFee: orderFee ?? this.orderFee,
       trackingPolylinePoints:

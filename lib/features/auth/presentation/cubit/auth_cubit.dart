@@ -15,7 +15,7 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       emit(state.copyWith(
         status: StateStatus.failure,
-        error: StateError(
+        error: CommonError(
             consoleMessage: 'Failed to sign in with Google: $e',
             message: "Something went wrong, Please try again later",
             code: "AUTH"),

@@ -1,14 +1,14 @@
-class StateError {
+class CommonError {
   final String message;
   final String code;
   final String consoleMessage;
 
-  const StateError(
+  const CommonError(
       {this.message = "Something went wrong, Please try again later",
       this.code = "",
       this.consoleMessage = ""});
 
-  factory StateError.initial() => const StateError();
+  factory CommonError.initial() => const CommonError();
 }
 
 enum StateStatus { initial, loading, failure, success }

@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:helpnest/features/service/presentation/pages/service_provider_list.dart';
+import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +13,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    _init();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,33 +93,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Builds the grid of services.
   Widget _buildServiceGrid() {
-    return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      itemCount: 8,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        childAspectRatio: 0.8,
-      ),
-      itemBuilder: (context, index) {
-        return _buildServiceItem("Plumber",
-            "https://cdn.dribbble.com/userupload/16782566/file/original-a1e8dab093cbde95aa248729ef505ae8.png?resize=1200x900&vertical=center",
-            () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const ServiceProviderList(
-                        category: 'Plumber',
-                      )));
-        });
+    return BlocConsumer<ServiceCubit, ServiceState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        return GridView.builder(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+          itemCount: state.services.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            childAspectRatio: 0.8,
+          ),
+          itemBuilder: (context, index) {
+            final service = state.services[index];
+            return _buildServiceItem(
+                title: service.name, imageUrl: service.logo, onPressed: () {});
+          },
+        );
       },
     );
   }
 
   /// Builds an individual service item for the grid.
   Widget _buildServiceItem(
-      String title, String imageUrl, Function() onPressed) {
+      {required String title,
+      required String imageUrl,
+      required void Function() onPressed}) {
     return IconButton(
       onPressed: onPressed,
       icon: Column(
@@ -206,5 +213,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  void _init() async {
+    context.read<ServiceCubit>().getServices();
   }
 }

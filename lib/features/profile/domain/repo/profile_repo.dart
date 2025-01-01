@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/profile/data/models/emergency_model.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
@@ -5,7 +7,10 @@ import 'package:helpnest/features/profile/data/models/service_provier_model.dart
 
 abstract class ProfileRepo {
   Future<void> requestServiceProviderAccess(
-      {required ServiceProviderModel provider});
+      {required ServiceProviderModel provider,
+      required File? aadhar,
+      required File? pan,
+      required File? experience});
   Stream<UserModel> getUser();
   Stream<ServiceProviderModel> getProvider();
   Stream<List<FeedbackModel>> getAppFeedback();
