@@ -109,15 +109,16 @@ class ProfileRemoteDs implements ProfileRepo {
               "${FirebaseAuth.instance.currentUser?.uid}/profile/experience.jpg",
         );
       }
-      provider = provider.copyWith(
-        aadharCardImageURL: aadharUrl,
-        panCardImageURL: panUrl,
-        experienceDocImageURL: experienceUrl,
-      );
       await firestore
           .collection('service_providers')
           .doc(provider.id)
-          .set(provider.toJson());
+          .set(provider
+              .copyWith(
+                aadharCardImageURL: aadharUrl ?? "",
+                panCardImageURL: panUrl ?? "",
+                experienceDocImageURL: experienceUrl ?? "",
+              )
+              .toJson());
     } catch (e) {
       throw Exception('Error requesting provider access: $e');
     }

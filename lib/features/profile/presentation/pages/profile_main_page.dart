@@ -55,7 +55,12 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                 _buildListTile(
                   icon: Iconsax.info_circle,
                   title: "Report a Safety Emergency",
-                  onTap: () {},
+                  onTap: () {
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (_) => const AdminMainPage()));
+                  },
                 ),
                 _buildListTile(
                   icon: Iconsax.support,
@@ -140,6 +145,8 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             Align(
               alignment: Alignment.centerLeft,
               child: _buildCircularImage(
+                padded: true,
+                imageUrl: 
                 serviceLogo ??
                     "https://cdn.dribbble.com/userupload/16281153/file/original-b6ff14bfc931d716c801ea7e250965ce.png?resize=1600x1200&vertical=center",
               ),
@@ -147,6 +154,7 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             Align(
               alignment: Alignment.centerRight,
               child: _buildCircularImage(
+                imageUrl: 
                 providerImage ??
                     "https://cdn.dribbble.com/userupload/16366138/file/original-c35bbf68ba08abeb0509f09de77dd62b.jpg?resize=1600x1200&vertical=center",
               ),
@@ -157,13 +165,14 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
     );
   }
 
-  Widget _buildCircularImage(String imageUrl) {
+  Widget _buildCircularImage({required String imageUrl, bool padded = false}) {
     return Container(
       alignment: Alignment.center,
       height: 125.h,
       width: 125.h,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
+        color: Colors.white,
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
         ],
@@ -171,15 +180,18 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
-        child: CachedNetworkImage(
-          height: 125.h,
-          width: 125.h,
-          fit: BoxFit.cover,
-          errorWidget: (c, u, e) {
-            log("CACHED_IMAGE_ERROR: $e");
-            return const Icon(Iconsax.gallery);
-          },
-          imageUrl: imageUrl,
+        child: Container(
+          padding: EdgeInsets.all(padded ? 20.r : 0),
+          child: CachedNetworkImage(
+            height: 125.h,
+            width: 125.h,
+            fit: BoxFit.cover,
+            errorWidget: (c, u, e) {
+              log("CACHED_IMAGE_ERROR: $e");
+              return const Icon(Iconsax.gallery);
+            },
+            imageUrl: imageUrl,
+          ),
         ),
       ),
     );
@@ -202,7 +214,8 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
           SizedBox(
             height: 135.h,
             child: Center(
-              child: _buildCircularImage(state.user.isNotEmpty
+              child: _buildCircularImage(
+                  imageUrl: state.user.isNotEmpty
                   ? state.user.first.image
                   : "helpNest User"),
             ),

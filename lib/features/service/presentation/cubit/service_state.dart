@@ -10,6 +10,7 @@ import 'package:helpnest/features/service/domain/repo/service_repo.dart';
 part 'service_cubit.dart';
 
 class ServiceState extends Equatable {
+  final String serviceID;
   final List<ServiceModel> services;
   final List<FindServiceProviderParams> serviceProviders;
   final StateStatus getServicesStatus;
@@ -18,6 +19,7 @@ class ServiceState extends Equatable {
   final CommonError error;
 
   const ServiceState({
+    this.serviceID = "",
     this.services = const [],
     this.serviceProviders = const [],
     this.getServicesStatus = StateStatus.initial,
@@ -27,6 +29,7 @@ class ServiceState extends Equatable {
   });
 
   ServiceState copyWith({
+    String? serviceID,
     List<ServiceModel>? services,
     List<FindServiceProviderParams>? serviceProviders,
     StateStatus? getServicesStatus,
@@ -35,6 +38,7 @@ class ServiceState extends Equatable {
     CommonError? error,
   }) {
     return ServiceState(
+      serviceID: serviceID ?? this.serviceID,
       services: services ?? this.services,
       serviceProviders: serviceProviders ?? this.serviceProviders,
       getServicesStatus: getServicesStatus ?? this.getServicesStatus,
@@ -47,6 +51,7 @@ class ServiceState extends Equatable {
 
   @override
   List<Object?> get props => [
+        serviceID,
         services,
         serviceProviders,
         getServicesStatus,

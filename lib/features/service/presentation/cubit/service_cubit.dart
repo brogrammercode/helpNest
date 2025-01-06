@@ -46,4 +46,7 @@ class ServiceCubit extends Cubit<ServiceState> {
           error: CommonError(consoleMessage: e.toString())));
     }
   }
+
+  Future<void> updateServiecID({required String serviceID}) async =>
+      emit(state.copyWith(serviceID: serviceID));
 }

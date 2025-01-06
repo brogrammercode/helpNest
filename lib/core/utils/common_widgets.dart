@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:badges/badges.dart' as badge;
-
 class CustomTextFormField extends StatelessWidget {
   final String labelText;
   final String? hintText;
@@ -16,6 +15,8 @@ class CustomTextFormField extends StatelessWidget {
   final int? minLines;
   final bool isEnabled;
   final TextInputType keyboardType;
+  final IconData? suffixIcon;
+  final void Function()? onTap;
 
   const CustomTextFormField({
     required this.labelText,
@@ -26,31 +27,45 @@ class CustomTextFormField extends StatelessWidget {
     this.isEnabled = true,
     this.keyboardType = TextInputType.text,
     super.key,
+    this.suffixIcon,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      minLines: minLines,
-      enabled: isEnabled,
-      keyboardType: keyboardType,
-      style: Theme.of(context)
-          .textTheme
-          .bodyMedium!
-          .copyWith(fontWeight: FontWeight.bold),
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey.withOpacity(.5),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Theme.of(context).primaryColor,
+    return GestureDetector(
+      onTap: onTap,
+      child: AbsorbPointer(
+        absorbing: !isEnabled,
+        child: TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          minLines: minLines,
+          enabled: isEnabled && onTap == null,
+          keyboardType: keyboardType,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(fontWeight: FontWeight.bold),
+          decoration: InputDecoration(
+            labelText: labelText,
+            hintText: hintText,
+            suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+            border: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.grey.withOpacity(.5),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.grey.withOpacity(.5),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
           ),
         ),
       ),

@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
+import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 
 class ServiceProviderList extends StatefulWidget {
-  final String category;
-
-  const ServiceProviderList({super.key, required this.category});
+  const ServiceProviderList({super.key});
 
   @override
   State<ServiceProviderList> createState() => _ServiceProviderListState();
@@ -15,43 +15,51 @@ class ServiceProviderList extends StatefulWidget {
 class _ServiceProviderListState extends State<ServiceProviderList> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.category, // Dynamic title based on the category
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHorizontalScroll(),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              child: const Text(
-                "A plumber is a skilled tradesperson who specializes in the installation, maintenance, and repair of pipes, fixtures, and appliances used to distribute water, gas, and waste in residential, commercial, and industrial settings.",
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-              ),
+    return BlocConsumer<ServiceCubit, ServiceState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        final service =
+            state.services.where((s) => s.id == state.serviceID).first;
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              service.name,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(fontWeight: FontWeight.bold),
             ),
-            _buildSection(
-              title: "Service Provider Near You",
-              itemCount: 5,
-              itemBuilder: (context, index) => _buildPersonTile(index != 4),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHorizontalScroll(slides: service.slides),
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                  child: Text(
+                    service.description,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.grey),
+                  ),
+                ),
+                _buildSection(
+                  title: "Service Provider Near You",
+                  itemCount: 5,
+                  itemBuilder: (context, index) => _buildPersonTile(index != 4),
+                ),
+                SizedBox(height: 20.h),
+                _buildSection(
+                  title: "Top Plumbers",
+                  itemCount: 3,
+                  itemBuilder: (context, index) => _buildPersonTile(index != 2),
+                ),
+              ],
             ),
-            SizedBox(height: 20.h),
-            _buildSection(
-              title: "Top Plumbers",
-              itemCount: 3,
-              itemBuilder: (context, index) => _buildPersonTile(index != 2),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -162,19 +170,13 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
     );
   }
 
-  Widget _buildHorizontalScroll() {
-    final List<String> imageUrls = [
-      "https://cdn.dribbble.com/userupload/16836268/file/original-e8e0c80d5364357af82908db651475e0.png?resize=1024x1025&vertical=center",
-      "https://cdn.dribbble.com/userupload/17223940/file/original-bc2bebdff2f7f6d38fecbd0046559099.png?resize=1600x1200&vertical=center",
-      // Add more URLs as needed
-    ];
-
+  Widget _buildHorizontalScroll({required List slides}) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           SizedBox(width: 20.w),
-          ...imageUrls.map((url) => _buildPopularItem(url)),
+          ...slides.map((url) => _buildPopularItem(url)),
         ],
       ),
     );

@@ -11,6 +11,7 @@ import 'package:helpnest/features/profile/presentation/pages/profile_main_page.d
 import 'package:helpnest/features/profile/presentation/pages/send_feedback_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/support_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/terms_condition.dart';
+import 'package:helpnest/features/service/presentation/pages/service_provider_list.dart';
 
 class AppRoutes {
   static const String core = '/';
@@ -27,6 +28,9 @@ class AppRoutes {
   static const String sendFeedbackPage = '/sendFeedbackPage';
   static const String supportPage = '/supportPage';
   static const String termsCondition = '/termsCondition';
+
+  // service
+  static const String serviceProviderListPage = '/serviceProviderListPage';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -61,6 +65,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SupportPage());
       case termsCondition:
         return MaterialPageRoute(builder: (_) => const TermsCondition());
+        
+      // auth
+      case serviceProviderListPage:
+        return MaterialPageRoute(builder: (_) => const ServiceProviderList());
 
       // case consumerDetail:
       //   final args = settings.arguments as Map<String, dynamic>?;
