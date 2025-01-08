@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1057167510210-e825kvpgcbkrvt9vt302cnv8i95evf6l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.helpnest",
+            "certificate_hash": "2a7fd8b45bd263d3eafdf4fddbfdbf9ece61ffd6"
+          }
+        },
+        {
           "client_id": "1057167510210-hovsloouagj0agfondjqaadai445fig7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
