@@ -4,9 +4,9 @@ import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
 import 'package:helpnest/features/profile/data/models/service_provier_model.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
-import 'package:helpnest/features/service/domain/repo/service_repo.dart';
+import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 
-class ServiceRemoteDs implements ServiceRepo {
+class ServiceRemoteDs implements ServiceRemoteRepo {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override

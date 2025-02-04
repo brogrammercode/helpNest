@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
-import 'package:helpnest/features/service/domain/repo/service_repo.dart';
+import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 
 part 'service_cubit.dart';
 

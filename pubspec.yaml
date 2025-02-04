@@ -41,12 +41,14 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.1.6
   flutter_screenutil: ^5.9.3
+  geolocator: ^13.0.2
   get_it: ^8.0.3
   google_fonts: ^6.2.1
   google_sign_in: ^6.2.2
   iconsax: ^0.0.8
   image_picker: ^1.1.2
   pinput: ^5.0.0
+  shared_preferences: ^2.5.1
   supabase_flutter: ^2.8.2
 
 dev_dependencies:

@@ -1,7 +1,10 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/features/search/presentation/cubit/search_cubit.dart';
 import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -15,25 +18,46 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildSearchBar(context),
-            _buildSection(
-              title: "People",
-              itemCount: 5,
-              itemBuilder: (context, index) => _buildPersonTile(),
+    return BlocConsumer<SearchCubit, SearchState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        final keywords = state.keywords;
+        final providers = state.keywords;
+        final services = state.keywords;
+        return Scaffold(
+          appBar: _buildAppBar(context),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildSearchBar(context),
+                _buildEmpty(),
+                if (keywords.isNotEmpty) ...[
+                  _buildSection(
+                    title: "History",
+                    itemCount: 5,
+                    itemBuilder: (context, index) =>
+                        _buildKeywordTile(bottomSpace: index != 4),
+                  ),
+                ],
+                if (providers.isNotEmpty) ...[
+                  _buildSection(
+                    title: "People",
+                    itemCount: 5,
+                    itemBuilder: (context, index) => _buildPersonTile(),
+                  ),
+                ],
+                if (services.isNotEmpty) ...[
+                  _buildSection(
+                    title: "Services",
+                    itemCount: 5,
+                    itemBuilder: (context, index) => _buildServiceTile(),
+                  ),
+                ],
+              ],
             ),
-            _buildSection(
-              title: "Services",
-              itemCount: 5,
-              itemBuilder: (context, index) => _buildServiceTile(),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -164,6 +188,44 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
+  Widget _buildKeywordTile({bool bottomSpace = true}) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ProviderProfile(),
+          ),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Iconsax.clock),
+              SizedBox(width: 20.w),
+              Expanded(
+                child: Text(
+                  "Credence",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+              IconButton(
+                  onPressed: () {}, icon: const Icon(CupertinoIcons.multiply)),
+              SizedBox(width: 0.w),
+            ],
+          ),
+          if (bottomSpace) SizedBox(height: 5.h),
+        ],
+      ),
+    );
+  }
+
   Widget _buildServiceTile() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -199,6 +261,33 @@ class _SearchPageState extends State<SearchPage> {
         width: 50.h,
         fit: BoxFit.cover,
         imageUrl: imageUrl,
+      ),
+    );
+  }
+ 
+  _buildEmpty() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 70.w),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 200.h),
+          CachedNetworkImage(
+            height: 50.h,
+            width: 50.h,
+            fit: BoxFit.cover,
+            imageUrl: "https://cdn-icons-png.flaticon.com/128/7486/7486760.png",
+          ),
+          SizedBox(height: 30.h),
+          const Text("It's quite in here...",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 10.h),
+          const Text(
+            "You can explore our services, our trustworthy and professional service providers to get the best user experience.",
+            style: TextStyle(color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

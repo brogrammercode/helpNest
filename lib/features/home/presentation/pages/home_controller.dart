@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/order/presentation/pages/history_page.dart';
 import 'package:helpnest/features/home/presentation/pages/home_screen.dart';
 import 'package:helpnest/features/profile/presentation/pages/profile_main_page.dart';
+import 'package:helpnest/features/search/presentation/cubit/search_cubit.dart';
 import 'package:helpnest/features/search/presentation/pages/search_page.dart';
+import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:helpnest/features/service/presentation/pages/service_main_page.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -16,6 +19,17 @@ class HomeController extends StatefulWidget {
 
 class _HomeControllerState extends State<HomeController> {
   int _bottomNavIndex = 0;
+
+  @override
+  void initState() {
+    _init();
+    super.initState();
+  }
+
+  void _init() async {
+    context.read<ServiceCubit>().getServices();
+    context.read<SearchCubit>().getSearchKeywords();
+  }
 
   @override
   Widget build(BuildContext context) {

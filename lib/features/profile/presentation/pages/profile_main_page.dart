@@ -6,8 +6,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
+import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
@@ -28,6 +30,20 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
           log(state.error.consoleMessage);
         } else if (state.logOutStatus == StateStatus.success) {
           Navigator.pushReplacementNamed(context, AppRoutes.onboardingPage);
+        }
+        if (state.getUserStatus == StateStatus.success) {
+          context.read<HomeCubit>().updatePosition(
+              position: Position(
+                  longitude: state.user.first.location.geopoint.longitude,
+                  latitude: state.user.first.location.geopoint.longitude,
+                  timestamp: DateTime.now(),
+                  accuracy: 100,
+                  altitude: 100,
+                  altitudeAccuracy: 100,
+                  heading: 100,
+                  headingAccuracy: 100,
+                  speed: 100,
+                  speedAccuracy: 100));
         }
       },
       builder: (context, state) {

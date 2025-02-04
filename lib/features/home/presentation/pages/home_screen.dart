@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/core/config/routes.dart';
+import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
+import 'package:helpnest/features/service/data/models/service_model.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -16,11 +18,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    _init();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeaderImage(),
+            // _buildHeaderImage(),
+            _buildHorizontalScroll(),
             SizedBox(height: 20.h),
             _buildSectionTitle(context, "Services"),
             _buildServiceGrid(),
@@ -82,15 +80,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Builds the main header image.
+  // ignore: unused_element
   Widget _buildHeaderImage() {
-    return BlocConsumer<ServiceCubit, ServiceState>(
+    return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {},
       builder: (context, state) {
-        if (state.services.isEmpty) {
+        if (state.adBanners.isEmpty) {
           return SizedBox(height: 250.h);
         }
 
-        final randomService = (state.services..shuffle()).first;
+        final randomService = (state.adBanners..shuffle()).first;
         return CachedNetworkImage(
           height: 250.h,
           width: double.infinity,
@@ -151,17 +150,17 @@ class _HomeScreenState extends State<HomeScreen> {
       icon: Column(
         children: [
           Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 3)),
-              ],
-            ),
+            // decoration: BoxDecoration(
+            //   shape: BoxShape.circle,
+            //   color: Colors.white,
+            //   boxShadow: [
+            //     BoxShadow(
+            //         color: Colors.grey.withOpacity(0.2),
+            //         spreadRadius: 1,
+            //         blurRadius: 2,
+            //         offset: const Offset(0, 3)),
+            //   ],
+            // ),
             padding: EdgeInsets.all(15.w),
             child: CachedNetworkImage(
               height: 35.h,
@@ -220,13 +219,16 @@ class _HomeScreenState extends State<HomeScreen> {
         if (state.services.isEmpty) {
           return SizedBox(height: 250.h);
         }
-        final randomService = (state.services..shuffle()).first;
+        final randomService = [
+          (state.services..shuffle()).first,
+          (state.services..shuffle())[1]
+        ];
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
               SizedBox(width: 20.w),
-              ...randomService.slides.map((url) => _buildPopularItem(url)),
+              ...randomService.map((service) => _buildPopularItem(service)),
               SizedBox(width: 20.w),
             ],
           ),
@@ -235,32 +237,93 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Builds an individual popular item.
-  Widget _buildPopularItem(String imageUrl) {
+Widget _buildPopularItem(ServiceModel service) {
     return Padding(
       padding: EdgeInsets.only(right: 10.w),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.r),
-        child: CachedNetworkImage(
-          height: 250.h,
-          width: 350.w,
-          fit: BoxFit.cover,
-          imageUrl: imageUrl,
-          placeholder: (context, url) => SizedBox(
-            height: 250.h,
-            width: 350.w,
-            child: const Center(
-                child: CircularProgressIndicator(
-              strokeWidth: 2,
-            )),
-          ),
-          errorWidget: (context, url, error) => Icon(Icons.error, size: 50.w),
+        child: Stack(
+          children: [
+            CachedNetworkImage(
+              height: 250.h,
+              width: 350.w,
+              fit: BoxFit.cover,
+              imageUrl: service.slides[0],
+              placeholder: (context, url) => SizedBox(
+                height: 250.h,
+                width: 350.w,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) =>
+                  Icon(Icons.error, size: 50.w),
+            ),
+            // Black fade effect
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 80.h,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(1),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(width: 15.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${service.name} Service",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                        ),
+                        Text(
+                          "Around 10,345 order was placed last week",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
+                        ),
+                        SizedBox(height: 15.w)
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 15.w)
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _init() async {
-    context.read<ServiceCubit>().getServices();
-  }
+
+  
 }
