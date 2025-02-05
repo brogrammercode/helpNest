@@ -6,10 +6,15 @@ class EmergencyEntity {
   final Timestamp emergencyTD;
   final UserLocationModel location;
   final String reportedBy;
+  final String adminResponse;
+  final bool resolved;
 
-  EmergencyEntity(
-      {required this.id,
-      required this.emergencyTD,
-      required this.location,
-      required this.reportedBy});
+  EmergencyEntity({
+    required this.id,
+    required this.emergencyTD,
+    required this.location,
+    required this.reportedBy,
+    required this.adminResponse,
+    required this.resolved,
+  });
 }

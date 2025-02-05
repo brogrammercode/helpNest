@@ -8,6 +8,8 @@ class EmergencyModel extends EmergencyEntity {
     required super.emergencyTD,
     required super.location,
     required super.reportedBy,
+    required super.adminResponse,
+    required super.resolved,
   });
 
   factory EmergencyModel.fromJson(Map<String, dynamic>? json) {
@@ -19,6 +21,8 @@ class EmergencyModel extends EmergencyEntity {
       emergencyTD: json['emergencyTD'] ?? Timestamp.now(),
       location: UserLocationModel.fromJson(json['location'] ?? {}),
       reportedBy: json['reportedBy'] ?? '',
+      adminResponse: json['adminResponse'] ?? '',
+      resolved: json['resolved'] ?? false,
     );
   }
 
@@ -28,12 +32,14 @@ class EmergencyModel extends EmergencyEntity {
       'emergencyTD': emergencyTD,
       'location': location.toJson(),
       'reportedBy': reportedBy,
+      'adminResponse': adminResponse,
+      'resolved': resolved,
     };
   }
 
   @override
   String toString() {
-    return 'EmergencyModel(id: $id, emergencyTD: $emergencyTD, location: $location, reportedBy: $reportedBy)';
+    return 'EmergencyModel(id: $id, emergencyTD: $emergencyTD, location: $location, reportedBy: $reportedBy, adminResponse: $adminResponse, resolved: $resolved)';
   }
 
   EmergencyModel copyWith({
@@ -41,12 +47,16 @@ class EmergencyModel extends EmergencyEntity {
     Timestamp? emergencyTD,
     UserLocationModel? location,
     String? reportedBy,
+    String? adminResponse,
+    bool? resolved,
   }) {
     return EmergencyModel(
       id: id ?? this.id,
       emergencyTD: emergencyTD ?? this.emergencyTD,
       location: location ?? this.location,
       reportedBy: reportedBy ?? this.reportedBy,
+      adminResponse: adminResponse ?? this.adminResponse,
+      resolved: resolved ?? this.resolved,
     );
   }
 }

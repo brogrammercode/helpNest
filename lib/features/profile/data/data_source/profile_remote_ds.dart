@@ -31,6 +31,8 @@ class ProfileRemoteDs implements ProfileRepo {
       return firestore
           .collection('feedbacks')
           .where("module", isNotEqualTo: "SERVICE PROVIDER")
+          .where("createdBy",
+              isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
           .snapshots()
           .map((snapshot) => snapshot.docs
               .map((doc) => FeedbackModel.fromJson(doc.data()))

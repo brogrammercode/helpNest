@@ -8,6 +8,7 @@ import 'package:helpnest/features/profile/presentation/pages/become_provider_sta
 import 'package:helpnest/features/profile/presentation/pages/edit_pro_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/privacy_policy.dart';
 import 'package:helpnest/features/profile/presentation/pages/profile_main_page.dart';
+import 'package:helpnest/features/profile/presentation/pages/report_safety_emergency_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/send_feedback_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/support_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/terms_condition.dart';
@@ -28,6 +29,7 @@ class AppRoutes {
   static const String sendFeedbackPage = '/sendFeedbackPage';
   static const String supportPage = '/supportPage';
   static const String termsCondition = '/termsCondition';
+  static const String reportSafetyEmergencyPage = '/reportSafetyEmergencyPage';
 
   // service
   static const String serviceProviderListPage = '/serviceProviderListPage';
@@ -65,6 +67,9 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SupportPage());
       case termsCondition:
         return MaterialPageRoute(builder: (_) => const TermsCondition());
+      case reportSafetyEmergencyPage:
+        return MaterialPageRoute(
+            builder: (_) => const ReportSafetyEmergencyPage());
         
       // auth
       case serviceProviderListPage:

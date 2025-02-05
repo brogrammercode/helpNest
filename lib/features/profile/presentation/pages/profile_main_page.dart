@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
+import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
@@ -71,12 +72,8 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                 _buildListTile(
                   icon: Iconsax.info_circle,
                   title: "Report a Safety Emergency",
-                  onTap: () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (_) => const AdminMainPage()));
-                  },
+                  onTap: () => Navigator.pushNamed(
+                      context, AppRoutes.reportSafetyEmergencyPage),
                 ),
                 _buildListTile(
                   icon: Iconsax.support,
@@ -113,7 +110,21 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                   title: state.logOutStatus == StateStatus.loading
                       ? "Logging out"
                       : "Log out",
-                  onTap: () async => context.read<ProfileCubit>().logOut(),
+                  onTap: () async {
+                    commonDialog(
+                      context: context,
+                      title: "Confirm Logout",
+                      description: "Are you sure you want to log out?",
+                      cancelText: "Cancel",
+                      cancelOnTap: () => Navigator.pop(context),
+                      agreeText: "Log Out",
+                      agreeOnTap: () {
+                        Navigator.pop(context);
+                        context.read<ProfileCubit>().logOut();
+                      },
+                      icon: Iconsax.lock_1,
+                    );
+                  },
                 ),
               ],
             ),

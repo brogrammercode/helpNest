@@ -17,6 +17,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType keyboardType;
   final IconData? suffixIcon;
   final void Function()? onTap;
+  final String? Function(String?)? validator;
 
   const CustomTextFormField({
     required this.labelText,
@@ -29,6 +30,7 @@ class CustomTextFormField extends StatelessWidget {
     super.key,
     this.suffixIcon,
     this.onTap,
+    this.validator,
   });
 
   @override
@@ -43,6 +45,7 @@ class CustomTextFormField extends StatelessWidget {
           minLines: minLines,
           enabled: isEnabled && onTap == null,
           keyboardType: keyboardType,
+          validator: validator,
           style: Theme.of(context)
               .textTheme
               .bodyMedium!

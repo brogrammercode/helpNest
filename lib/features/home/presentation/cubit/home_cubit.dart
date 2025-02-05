@@ -34,17 +34,12 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  Future<void> getAdBanner({required Position position}) async {
+  Future<void> getAdBanner({required Position? position}) async {
     try {
       emit(state.copyWith(getAdBannerStatus: StateStatus.loading));
-      if (state.position != null) {
-        final adBanners = await _adBannerRepo.getAdBanner(position: position);
-        emit(state.copyWith(
-            adBanners: adBanners, getAdBannerStatus: StateStatus.success));
-      } else {
-        emit(state
-            .copyWith(adBanners: [], getAdBannerStatus: StateStatus.success));
-      }
+      final adBanners = await _adBannerRepo.getAdBanner(position: position);
+      emit(state.copyWith(
+          adBanners: adBanners, getAdBannerStatus: StateStatus.success));
     } catch (e) {
       emit(state.copyWith(
           getAdBannerStatus: StateStatus.failure,
@@ -58,7 +53,7 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  void _onPositionChanged(Position position) {
+  void _onPositionChanged(Position? position) {
     getAdBanner(position: position);
   }
 

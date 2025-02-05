@@ -7,9 +7,8 @@ import 'package:helpnest/features/home/domain/repo/ad_banner_repo.dart';
 
 class AdBannerRemoteDs implements AdBannerRepo {
   @override
-  Future<List<AdBannerModel>> getAdBanner({required Position position}) async {
+  Future<List<AdBannerModel>> getAdBanner({required Position? position}) async {
     try {
-      final Position userLocation = await Geolocator.getCurrentPosition();
       final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
       final querySnapshot =
           await FirebaseFirestore.instance.collection('ad_banners').get();
@@ -36,12 +35,13 @@ class AdBannerRemoteDs implements AdBannerRepo {
         final bool isWithinTimeRange =
             _isWithinTimeRange(startTD: banner.startTD, endTD: banner.endTD);
 
-        final bool isWithinLocation = _validateGeoPoints(
-          geoPoints: banner.geoPoints,
-          userLat: userLocation.latitude,
-          userLng: userLocation.longitude,
-          radius: banner.radius,
-        );
+        final bool isWithinLocation = position == null ||
+            _validateGeoPoints(
+              geoPoints: banner.geoPoints,
+              userLat: position.latitude,
+              userLng: position.longitude,
+              radius: banner.radius,
+            );
 
         return hasValidParticularID &&
             hasValidParticularDay &&
@@ -54,6 +54,7 @@ class AdBannerRemoteDs implements AdBannerRepo {
       throw Exception('Error fetching ad_banners: $error');
     }
   }
+
 
   bool _validateParticularID({
     required List<String> particularID,
