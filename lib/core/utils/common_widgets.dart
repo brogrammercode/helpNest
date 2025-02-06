@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:badges/badges.dart' as badge;
+
 class CustomTextFormField extends StatelessWidget {
   final String labelText;
   final String? hintText;
@@ -18,6 +19,7 @@ class CustomTextFormField extends StatelessWidget {
   final IconData? suffixIcon;
   final void Function()? onTap;
   final String? Function(String?)? validator;
+  final bool underlineBorderedTextField;
 
   const CustomTextFormField({
     required this.labelText,
@@ -31,6 +33,7 @@ class CustomTextFormField extends StatelessWidget {
     this.suffixIcon,
     this.onTap,
     this.validator,
+    this.underlineBorderedTextField = false,
   });
 
   @override
@@ -54,17 +57,30 @@ class CustomTextFormField extends StatelessWidget {
             labelText: labelText,
             hintText: hintText,
             suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
-            border: OutlineInputBorder(
+            border: underlineBorderedTextField
+                ? const UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black26),
+                  )
+                : OutlineInputBorder(
               borderSide: BorderSide(
                 color: Colors.grey.withOpacity(.5),
               ),
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: underlineBorderedTextField
+                ? const UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black26),
+                  )
+                : OutlineInputBorder(
               borderSide: BorderSide(
                 color: Colors.grey.withOpacity(.5),
               ),
             ),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: underlineBorderedTextField
+                ? UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Theme.of(context).primaryColor),
+                  )
+                : OutlineInputBorder(
               borderSide: BorderSide(
                 color: Theme.of(context).primaryColor,
               ),
@@ -85,6 +101,7 @@ class CustomImageUploader extends StatefulWidget {
   File? image;
   String? imageUrl;
   final bool readOnly;
+  final bool circularMode;
 
   CustomImageUploader({
     super.key,
@@ -95,6 +112,7 @@ class CustomImageUploader extends StatefulWidget {
     this.image,
     this.imageUrl,
     this.readOnly = false,
+    this.circularMode = false,
   });
 
   @override
@@ -117,10 +135,16 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
   @override
   Widget build(BuildContext context) {
     return badge.Badge(
-      position: badge.BadgePosition.topEnd(top: 20.h, end: 20.h),
-      badgeContent: Icon(Iconsax.close_circle, color: Colors.black, size: 20.r),
-      badgeStyle: const badge.BadgeStyle(badgeColor: Colors.white),
-      showBadge: widget.image != null,
+      position: widget.circularMode
+          ? badge.BadgePosition.bottomEnd(bottom: 0.h, end: 20.h)
+          : badge.BadgePosition.topEnd(top: 20.h, end: 20.h),
+      badgeContent: Icon(Icons.edit,
+          color: widget.circularMode ? Colors.white : Colors.black, size: 17.r),
+      badgeStyle: badge.BadgeStyle(
+          badgeColor: widget.circularMode
+              ? Theme.of(context).primaryColor
+              : Colors.white),
+      showBadge: widget.image != null || widget.imageUrl != null,
       onTap: () {
         setState(() {
           widget.image = null;
@@ -128,20 +152,30 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
         widget.onCancel;
       },
       child: GestureDetector(
-        // onTap: _pickImage,
         onTap: widget.readOnly ? () {} : _pickImage,
         child: Container(
           height: widget.height,
           width: widget.width,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.withOpacity(.3)),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius:
+                widget.circularMode ? null : BorderRadius.circular(10),
+            shape: widget.circularMode ? BoxShape.circle : BoxShape.rectangle,
             color: Colors.grey.withOpacity(.1),
           ),
-          padding: EdgeInsets.all(
+          padding: widget.circularMode
+              ? EdgeInsets.zero
+              : EdgeInsets.all(
               widget.image != null || widget.imageUrl != null ? 10.w : 0),
           child: widget.image != null
-              ? ClipRRect(
+              ? widget.circularMode
+                  ? ClipOval(
+                      child: Image.file(
+                        widget.image!,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.file(
                     widget.image!,
@@ -149,7 +183,18 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
                   ),
                 )
               : widget.imageUrl != null
-                  ? ClipRRect(
+                  ? widget.circularMode
+                      ? ClipOval(
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            errorWidget: (c, u, e) {
+                              log("CACHED_IMAGE_ERROR: $e");
+                              return const Icon(Iconsax.gallery);
+                            },
+                            imageUrl: widget.imageUrl ?? "",
+                          ),
+                        )
+                      : ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
@@ -165,7 +210,8 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Iconsax.gallery),
-                        SizedBox(height: 10.h),
+                        if (!widget.circularMode) ...[
+                          SizedBox(height: 10.h),
                         Text(
                           "Upload an Image",
                           style: Theme.of(context)
@@ -173,6 +219,8 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
                               .bodyMedium!
                               .copyWith(fontWeight: FontWeight.bold),
                         ),
+                        ],
+                        
                       ],
                     ),
         ),

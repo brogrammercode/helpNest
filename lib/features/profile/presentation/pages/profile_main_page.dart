@@ -58,7 +58,8 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                 _buildListTile(
                   icon: Iconsax.frame_1,
                   title: "Your Profile",
-                  onTap: () async {},
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.editProPage),
                 ),
                 _buildListTile(
                   icon: Iconsax.briefcase,

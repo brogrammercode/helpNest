@@ -166,9 +166,22 @@ class ProfileRemoteDs implements ProfileRepo {
   }
 
   @override
-  Future<void> updateUser({required UserModel user}) async {
+  Future<void> updateUser(
+      {required UserModel user, required File? image}) async {
     try {
-      await firestore.collection('users').doc(user.id).update(user.toJson());
+      String? imageUrl;
+      if (image != null) {
+        imageUrl = await uploadFileAndGetUrl(
+          file: image,
+          path: "${FirebaseAuth.instance.currentUser?.uid}/profile/image.jpg",
+        );
+      } else {
+        imageUrl = user.image;
+      }
+      await firestore
+          .collection('users')
+          .doc(user.id)
+          .update(user.copyWith(image: imageUrl).toJson());
     } catch (e) {
       throw Exception('Error updating user: $e');
     }

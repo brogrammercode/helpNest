@@ -43,7 +43,7 @@ class UserModel extends UserEntity {
   }
 
   @override
-  String toString() {
+String toString() {
     return 'UserModel(id: $id, name: $name, phoneNumber: $phoneNumber, location: $location, image: $image, gender: $gender, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
   }
 

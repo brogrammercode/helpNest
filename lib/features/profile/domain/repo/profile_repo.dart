@@ -17,7 +17,7 @@ abstract class ProfileRepo {
   Stream<EmergencyModel> getEmergency();
   Future<void> addFeedback({required FeedbackModel feedback});
   Future<void> reportSafetyEmergency({required EmergencyModel emergency});
-  Future<void> updateUser({required UserModel user});
+  Future<void> updateUser({required UserModel user, required File? image});
   Future<void> updateProvider({required ServiceProviderModel provider});
   Future<void> logOut();
 }

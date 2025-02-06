@@ -111,11 +111,10 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  Future<void> updateUser(UserModel user) async {
+  Future<void> updateUser(UserModel user, File? image) async {
     try {
       emit(state.copyWith(updateUserStatus: StateStatus.loading));
-
-      await _repo.updateUser(user: user);
+      await _repo.updateUser(user: user, image: image);
       emit(state.copyWith(updateUserStatus: StateStatus.success));
     } catch (e) {
       emit(state.copyWith(
