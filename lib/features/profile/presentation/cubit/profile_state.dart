@@ -17,6 +17,7 @@ class ProfileState extends Equatable {
   final List<UserModel> user;
   final List<ServiceProviderModel> provider;
   final List<FeedbackModel> appFeedbacks;
+  final List<EmergencyModel> emergency;
   final CommonError error;
   final GeoPoint currentLocation;
   final StateStatus addFeedbackStatus;
@@ -24,6 +25,7 @@ class ProfileState extends Equatable {
   final StateStatus getProviderStatus;
   final StateStatus getUserStatus;
   final StateStatus reportSafetyEmergencyStatus;
+  final StateStatus getEmergencyStatus;
   final StateStatus requestServiceProviderAccessStatus;
   final StateStatus updateProviderStatus;
   final StateStatus updateUserStatus;
@@ -33,6 +35,7 @@ class ProfileState extends Equatable {
     this.user = const [],
     this.provider = const [],
     this.appFeedbacks = const [],
+    this.emergency = const [],
     this.error = const CommonError(),
     this.currentLocation = const GeoPoint(0, 0),
     this.addFeedbackStatus = StateStatus.initial,
@@ -40,6 +43,7 @@ class ProfileState extends Equatable {
     this.getProviderStatus = StateStatus.initial,
     this.getUserStatus = StateStatus.initial,
     this.reportSafetyEmergencyStatus = StateStatus.initial,
+    this.getEmergencyStatus = StateStatus.initial,
     this.requestServiceProviderAccessStatus = StateStatus.initial,
     this.updateProviderStatus = StateStatus.initial,
     this.updateUserStatus = StateStatus.initial,
@@ -50,6 +54,7 @@ class ProfileState extends Equatable {
     List<UserModel>? user,
     List<ServiceProviderModel>? provider,
     List<FeedbackModel>? appFeedbacks,
+    List<EmergencyModel>? emergency,
     CommonError? error,
     GeoPoint? currentLocation,
     StateStatus? addFeedbackStatus,
@@ -57,6 +62,7 @@ class ProfileState extends Equatable {
     StateStatus? getProviderStatus,
     StateStatus? getUserStatus,
     StateStatus? reportSafetyEmergencyStatus,
+    StateStatus? getEmergencyStatus,
     StateStatus? requestServiceProviderAccessStatus,
     StateStatus? updateProviderStatus,
     StateStatus? updateUserStatus,
@@ -66,6 +72,7 @@ class ProfileState extends Equatable {
       user: user ?? this.user,
       provider: provider ?? this.provider,
       appFeedbacks: appFeedbacks ?? this.appFeedbacks,
+      emergency: emergency ?? this.emergency,
       error: error ?? this.error,
       currentLocation: currentLocation ?? this.currentLocation,
       addFeedbackStatus: addFeedbackStatus ?? this.addFeedbackStatus,
@@ -74,6 +81,7 @@ class ProfileState extends Equatable {
       getUserStatus: getUserStatus ?? this.getUserStatus,
       reportSafetyEmergencyStatus:
           reportSafetyEmergencyStatus ?? this.reportSafetyEmergencyStatus,
+      getEmergencyStatus: getEmergencyStatus ?? this.getEmergencyStatus,
       requestServiceProviderAccessStatus: requestServiceProviderAccessStatus ??
           this.requestServiceProviderAccessStatus,
       updateProviderStatus: updateProviderStatus ?? this.updateProviderStatus,
@@ -87,6 +95,7 @@ class ProfileState extends Equatable {
         user,
         provider,
         appFeedbacks,
+        emergency,
         error,
         currentLocation,
         addFeedbackStatus,
@@ -94,6 +103,7 @@ class ProfileState extends Equatable {
         getProviderStatus,
         getUserStatus,
         reportSafetyEmergencyStatus,
+        getEmergencyStatus,
         requestServiceProviderAccessStatus,
         updateProviderStatus,
         updateUserStatus,

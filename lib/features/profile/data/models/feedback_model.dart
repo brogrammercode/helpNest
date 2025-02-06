@@ -9,6 +9,8 @@ class FeedbackModel extends FeedbackEntity {
     required super.category, // Service Provider Feedback
     required super.title, // uid of the provider
     required super.description, // desc
+    required super.response,
+    required super.responseTD,
     required super.creationTD,
     required super.createdBy,
     required super.deactivate,
@@ -22,6 +24,8 @@ class FeedbackModel extends FeedbackEntity {
       category: json['category'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
+      response: json['response'] ?? '',
+      responseTD: json['responseTD'] ?? Timestamp.now(),
       creationTD: json['creationTD'] ?? Timestamp.now(),
       createdBy: json['createdBy'] ?? '',
       deactivate: json['deactivate'] ?? false,
@@ -36,6 +40,8 @@ class FeedbackModel extends FeedbackEntity {
       'category': category,
       'title': title,
       'description': description,
+      'response': response,
+      'responseTD': responseTD,
       'creationTD': creationTD,
       'createdBy': createdBy,
       'deactivate': deactivate,
@@ -44,7 +50,7 @@ class FeedbackModel extends FeedbackEntity {
 
   @override
   String toString() {
-    return 'FeedbackModel(id: $id, rating: $rating, module: $module, category: $category, title: $title, description: $description, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
+    return 'FeedbackModel(id: $id, rating: $rating, module: $module, category: $category, title: $title, description: $description, response: $response, responseTD: $responseTD, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
   }
 
   FeedbackModel copyWith({
@@ -54,6 +60,8 @@ class FeedbackModel extends FeedbackEntity {
     String? category,
     String? title,
     String? description,
+    String? response,
+    Timestamp? responseTD,
     Timestamp? creationTD,
     String? createdBy,
     bool? deactivate,
@@ -65,6 +73,8 @@ class FeedbackModel extends FeedbackEntity {
       category: category ?? this.category,
       title: title ?? this.title,
       description: description ?? this.description,
+      response: response ?? this.response,
+      responseTD: responseTD ?? this.responseTD,
       creationTD: creationTD ?? this.creationTD,
       createdBy: createdBy ?? this.createdBy,
       deactivate: deactivate ?? this.deactivate,

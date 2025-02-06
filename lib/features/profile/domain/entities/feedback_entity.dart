@@ -7,6 +7,8 @@ class FeedbackEntity {
   final String category;
   final String title;
   final String description;
+  final String response;
+  final Timestamp responseTD;
   final Timestamp creationTD;
   final String createdBy;
   final bool deactivate;
@@ -18,6 +20,8 @@ class FeedbackEntity {
       required this.category,
       required this.title,
       required this.description,
+      required this.response,
+      required this.responseTD,
       required this.creationTD,
       required this.createdBy,
       required this.deactivate});

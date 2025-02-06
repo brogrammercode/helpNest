@@ -69,6 +69,33 @@ class ProfileRemoteDs implements ProfileRepo {
   }
 
   @override
+  Stream<EmergencyModel> getEmergency() {
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        return Stream.error('User is not logged in');
+      }
+
+      return firestore
+          .collection('emergencies')
+          .where("status", isNotEqualTo: "Resolved")
+          .where("reportedBy", isEqualTo: userId)
+          .orderBy("emergencyTD", descending: true)
+          .limit(1)
+          .snapshots()
+          .map((snapshot) {
+        if (snapshot.docs.isEmpty) {
+          throw Exception('No active emergency reports found');
+        }
+        return EmergencyModel.fromJson(snapshot.docs.first.data());
+      });
+    } catch (e) {
+      return Stream.error('Error fetching latest emergency: $e');
+    }
+  }
+
+
+  @override
   Future<void> reportSafetyEmergency(
       {required EmergencyModel emergency}) async {
     try {

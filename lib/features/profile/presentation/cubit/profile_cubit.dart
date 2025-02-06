@@ -5,6 +5,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   StreamSubscription? _userSubscription;
   StreamSubscription? _providerSubscription;
   StreamSubscription? _appFeedbackSubscription;
+  StreamSubscription? _emergencySubscription;
 
   ProfileCubit({required ProfileRepo repo})
       : _repo = repo,
@@ -12,6 +13,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     getUser();
     getProvider();
     getAppFeedback();
+    getEmergency();
   }
 
   @override
@@ -19,6 +21,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     await _userSubscription?.cancel();
     await _providerSubscription?.cancel();
     await _appFeedbackSubscription?.cancel();
+    await _emergencySubscription?.cancel();
     super.close();
   }
 
@@ -63,6 +66,21 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(state.copyWith(
           getAppFeedbackStatus: StateStatus.failure,
+          error: CommonError(consoleMessage: e.toString())));
+    }
+  }
+
+  Future<void> getEmergency() async {
+    try {
+      emit(state.copyWith(getEmergencyStatus: StateStatus.loading));
+
+      _emergencySubscription = _repo.getEmergency().listen((emergency) {
+        emit(state.copyWith(
+            emergency: [emergency], getEmergencyStatus: StateStatus.success));
+      });
+    } catch (e) {
+      emit(state.copyWith(
+          getEmergencyStatus: StateStatus.failure,
           error: CommonError(consoleMessage: e.toString())));
     }
   }

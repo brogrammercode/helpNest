@@ -35,63 +35,66 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {},
       builder: (context, state) {
-        return Scaffold(
-          appBar: _appBar(context),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: _submitButton(context, state),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 10.h),
-                  CustomTextFormField(
-                    labelText: "Select Feature",
-                    controller: featureController,
-                    onTap: () => commonBottomSheet(
-                        context: context,
-                        title: 'Select an option',
-                        options: _features,
-                        onSelected: (String value) {
-                          featureController.text = value;
-                        }),
-                    suffixIcon: Iconsax.arrow_down_1,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please select an option";
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10.h),
-                  CustomTextFormField(
-                    labelText: "Enter Description",
-                    controller: descriptionController,
-                    maxLines: 10,
-                    minLines: 3,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please select an option";
-                      }
-                      return null;
-                    },
-                  ),
-                  if (state.appFeedbacks.isNotEmpty) ...[
-                    SizedBox(height: 20.h),
-                    Text(
-                      "Your Feedbacks",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(fontWeight: FontWeight.bold),
+        return RefreshIndicator(
+          onRefresh: () => context.read<ProfileCubit>().getAppFeedback(),
+          child: Scaffold(
+            appBar: _appBar(context),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: _submitButton(context, state),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10.h),
+                    CustomTextFormField(
+                      labelText: "Select Feature",
+                      controller: featureController,
+                      onTap: () => commonBottomSheet(
+                          context: context,
+                          title: 'Select an option',
+                          options: _features,
+                          onSelected: (String value) {
+                            featureController.text = value;
+                          }),
+                      suffixIcon: Iconsax.arrow_down_1,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please select an option";
+                        }
+                        return null;
+                      },
                     ),
-                    SizedBox(height: 20.h),
-                    _buildReviewsSection(context, state.appFeedbacks),
+                    SizedBox(height: 10.h),
+                    CustomTextFormField(
+                      labelText: "Enter Description",
+                      controller: descriptionController,
+                      maxLines: 10,
+                      minLines: 3,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please select an option";
+                        }
+                        return null;
+                      },
+                    ),
+                    if (state.appFeedbacks.isNotEmpty) ...[
+                      SizedBox(height: 20.h),
+                      Text(
+                        "Your Feedbacks",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 20.h),
+                      _buildReviewsSection(context, state.appFeedbacks),
+                    ],
+                    SizedBox(height: 70.h),
                   ],
-                  SizedBox(height: 70.h),
-                ],
+                ),
               ),
             ),
           ),
@@ -127,6 +130,9 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
     String formattedDate =
         DateFormat('MMM dd').format(feedback.creationTD.toDate());
 
+    String responseDate =
+        DateFormat('MMM dd').format(feedback.responseTD.toDate());
+
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
@@ -140,13 +146,65 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(feedback.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  Icon(
+                    feedback.response.isNotEmpty
+                        ? Iconsax.shield_tick
+                        : Iconsax.clock,
+                    size: 17.r,
+                    color: feedback.response.isNotEmpty
+                        ? Theme.of(context).primaryColor
+                        : null,
+                  ),
+                  SizedBox(width: 10.w),
+                  Text(feedback.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
               Text(formattedDate),
             ],
           ),
           SizedBox(height: 10.h),
           Text(feedback.description),
+          if (feedback.response.isNotEmpty) ...[
+            SizedBox(height: 20.h),
+            Row(
+              children: [
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(5.r)),
+                  child: Text(
+                    "helpNest Team",
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+                SizedBox(width: 10.w),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.withOpacity(.3)),
+                      borderRadius: BorderRadius.circular(5.r)),
+                  child: Text(
+                    responseDate,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+            Text(feedback.response,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+
         ],
       ),
     );
@@ -176,10 +234,12 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
             context.read<ProfileCubit>().addFeedback(FeedbackModel(
                   id: td.millisecondsSinceEpoch.toString(),
                   rating: 0,
-                  module: "",
+                  module: "PROFILE",
                   category: "",
                   title: featureController.text,
                   description: descriptionController.text,
+                  response: "",
+                  responseTD: td,
                   creationTD: td,
                   createdBy: FirebaseAuth.instance.currentUser?.uid ?? "",
                   deactivate: false,
