@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
@@ -8,17 +9,21 @@ import 'package:helpnest/features/service/data/models/service_model.dart';
 abstract class ServiceRemoteRepo {
   Future<List<ServiceModel>> getServices();
   Future<List<FindServiceProviderParams>> findServiceProvider(
-      {required String serviceID});
+      {required String serviceID, required Position? position});
   Future<void> addOrder({required OrderModel order});
 }
 
 class FindServiceProviderParams {
-  final List<ServiceProviderModel> serviceProviders;
-  final List<UserModel> users;
+  final ServiceProviderModel serviceProvider;
+  final UserModel user;
   final List<FeedbackModel> feedbacks;
+  final double? distance;
 
   FindServiceProviderParams(
-      {required this.serviceProviders,
-      required this.users,
-      required this.feedbacks});
+      {
+    required this.serviceProvider,
+    required this.user,
+    required this.feedbacks,
+    this.distance,
+  });
 }

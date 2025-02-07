@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
@@ -18,11 +20,13 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
     }
   }
 
-
   @override
-  Future<List<FindServiceProviderParams>> findServiceProvider(
-      {required String serviceID}) async {
+  Future<List<FindServiceProviderParams>> findServiceProvider({
+    required String serviceID,
+    required Position? position,
+  }) async {
     try {
+      // 🔍 Fetch service providers with the given serviceID
       QuerySnapshot serviceProvidersSnapshot = await firestore
           .collection('service_providers')
           .where('serviceID', isEqualTo: serviceID)
@@ -34,49 +38,72 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
               ServiceProviderModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
 
-      List<UserModel> users = await _getUsersForProviders(serviceProviders);
-      List<FeedbackModel> feedbacks =
-          await _getFeedbacksForProviders(serviceProviders);
+      // 🚀 Fetch user & feedback data in parallel
+      List<FindServiceProviderParams> result = await Future.wait(
+        serviceProviders.map((serviceProvider) async {
+          UserModel user = await _getUserForProvider(serviceProvider.id);
+          List<FeedbackModel> feedbacks =
+              await _getFeedbacksForProvider(serviceProvider.id);
 
-      return [
-        FindServiceProviderParams(
-          serviceProviders: serviceProviders,
-          users: users,
-          feedbacks: feedbacks,
-        ),
-      ];
+          double? distance;
+          if (position != null &&
+              user.location.geopoint != const GeoPoint(0, 0)) {
+            distance = calculateDistance(
+              point1: (position.latitude, position.longitude),
+              point2: (
+                user.location.geopoint.latitude,
+                user.location.geopoint.longitude
+              ),
+            );
+          }
+
+          return FindServiceProviderParams(
+            serviceProvider: serviceProvider,
+            user: user,
+            feedbacks: feedbacks,
+            distance: distance,
+          );
+        }),
+      );
+
+      // 📏 Sort providers by distance if position is available
+      if (position != null) {
+        result.sort((a, b) => (a.distance ?? double.infinity)
+            .compareTo(b.distance ?? double.infinity));
+      }
+
+      return result;
     } catch (e) {
-      throw Exception('Error finding service providers params: $e');
+      throw Exception('❌ Error finding service providers params: $e');
     }
   }
 
-  Future<List<UserModel>> _getUsersForProviders(
-      List<ServiceProviderModel> providers) async {
-    List<UserModel> users = [];
-    for (var provider in providers) {
-      DocumentSnapshot userSnapshot =
-          await firestore.collection('users').doc(provider.id).get();
-      users
-          .add(UserModel.fromJson(userSnapshot.data() as Map<String, dynamic>));
+  /// 🏷️ Fetches user data for a provider
+  Future<UserModel> _getUserForProvider(String providerId) async {
+    DocumentSnapshot userSnapshot =
+        await firestore.collection('users').doc(providerId).get();
+
+    if (!userSnapshot.exists) {
+      throw Exception('❌ User not found for provider ID: $providerId');
     }
-    return users;
+
+    return UserModel.fromJson(userSnapshot.data() as Map<String, dynamic>);
   }
 
-  Future<List<FeedbackModel>> _getFeedbacksForProviders(
-      List<ServiceProviderModel> providers) async {
-    List<FeedbackModel> feedbacks = [];
-    for (var provider in providers) {
-      QuerySnapshot feedbackSnapshot = await firestore
-          .collection('feedbacks')
-          .where('title', isEqualTo: provider.id)
-          .get();
-      feedbacks.addAll(feedbackSnapshot.docs
-          .map((doc) =>
-              FeedbackModel.fromJson(doc.data() as Map<String, dynamic>))
-          .toList());
-    }
-    return feedbacks;
+  /// 🏷️ Fetches feedbacks for a provider
+  Future<List<FeedbackModel>> _getFeedbacksForProvider(
+      String providerId) async {
+    QuerySnapshot feedbackSnapshot = await firestore
+        .collection('feedbacks')
+        .where('title', isEqualTo: providerId)
+        .get();
+
+    return feedbackSnapshot.docs
+        .map(
+            (doc) => FeedbackModel.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
   }
+
 
   @override
   Future<List<ServiceModel>> getServices() async {

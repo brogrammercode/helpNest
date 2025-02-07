@@ -20,11 +20,13 @@ class ServiceCubit extends Cubit<ServiceState> {
     }
   }
 
-  Future<void> findServiceProviders({required String serviceID}) async {
+  Future<void> findServiceProviders(
+      {required String serviceID, required Position? position}) async {
     try {
       emit(state.copyWith(findServiceProvidersStatus: StateStatus.loading));
       final serviceProviders =
-          await _remoteRepo.findServiceProvider(serviceID: serviceID);
+          await _remoteRepo.findServiceProvider(
+          serviceID: serviceID, position: position);
       emit(state.copyWith(
           serviceProviders: serviceProviders,
           findServiceProvidersStatus: StateStatus.success));
@@ -47,6 +49,6 @@ class ServiceCubit extends Cubit<ServiceState> {
     }
   }
 
-  Future<void> updateServiecID({required String serviceID}) async =>
+  Future<void> updateServiceID({required String serviceID}) async =>
       emit(state.copyWith(serviceID: serviceID));
 }

@@ -1,5 +1,6 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,16 +21,16 @@ Future<String?> uploadFileAndGetUrl(
     await supabase.storage.from(bucket).upload(
           path,
           file,
-          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+          fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
         );
 
     String fileUrl = supabase.storage.from(bucket).getPublicUrl(path);
 
-    log('File uploaded successfully! File URL: $fileUrl');
+    dev.log('File uploaded successfully! File URL: $fileUrl');
 
     return fileUrl;
   } catch (e) {
-    log("UPLOAD_FILE_ERROR: $e");
+    dev.log("UPLOAD_FILE_ERROR: $e");
     return null;
   }
 }
@@ -197,7 +198,7 @@ Future<UserLocationModel> getUserLocationFromPosition(Position position) async {
       throw Exception("No placemarks found");
     }
   } catch (e) {
-    log("ERROR_GETTING_LOCATION_DATA: $e");
+    dev.log("ERROR_GETTING_LOCATION_DATA: $e");
     rethrow;
   }
 }
@@ -217,4 +218,50 @@ String _getContinentFromCountry(String country) {
   };
 
   return countryToContinent[country] ?? "Unknown";
+}
+
+
+/// 🌍 Calculates distance between points using the Haversine formula.
+double calculateDistance({
+  (double, double)? point1,
+  (double, double)? point2,
+  List<(double, double)>? points,
+}) {
+  const double R = 6371; // 🌎 Earth radius in km
+
+  double degToRad(double deg) => deg * (pi / 180);
+
+  double haversine(double lat1, double lon1, double lat2, double lon2) {
+    double dLat = degToRad(lat2 - lat1);
+    double dLon = degToRad(lon2 - lon1);
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(degToRad(lat1)) *
+            cos(degToRad(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return R * c;
+  }
+
+  /// 📍 Distance between two points
+  if (point1 != null && point2 != null) {
+    return haversine(point1.$1, point1.$2, point2.$1, point2.$2);
+  }
+
+  /// 🛣️ Total distance for multiple points
+  if (points != null && points.length > 1) {
+    double totalDistance = 0.0;
+    for (int i = 0; i < points.length - 1; i++) {
+      totalDistance += haversine(
+        points[i].$1,
+        points[i].$2,
+        points[i + 1].$1,
+        points[i + 1].$2,
+      );
+    }
+    return totalDistance;
+  }
+
+  throw ArgumentError(
+      '⚠️ Provide either (point1 & point2) or a list of points.');
 }

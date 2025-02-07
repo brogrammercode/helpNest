@@ -34,8 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildSectionTitle(context, "Services"),
             _buildServiceGrid(),
             SizedBox(height: 10.h),
-            _buildSectionTitle(context, "Popular"),
-            _buildHorizontalScroll(),
+            // _buildSectionTitle(context, "Popular"),
+            // _buildHorizontalScroll(),
             SizedBox(height: 10.h),
           ],
         ),
@@ -194,7 +194,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () async {
                   await context
                       .read<ServiceCubit>()
-                      .updateServiecID(serviceID: service.id);
+                      .updateServiceID(serviceID: service.id);
+                  await context.read<ServiceCubit>().findServiceProviders(
+                      serviceID: service.id,
+                      position: context.read<HomeCubit>().state.position);
                   Navigator.pushNamed(
                       context, AppRoutes.serviceProviderListPage);
                 });
@@ -211,6 +214,10 @@ class _HomeScreenState extends State<HomeScreen> {
       required void Function() onPressed}) {
     return IconButton(
       onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+          overlayColor: Colors.grey.withOpacity(.1)),
       icon: Column(
         children: [
           Container(
@@ -440,7 +447,7 @@ class LocationBottomSheet extends StatelessWidget {
                     ),
                     Text(
                       "updated on: ${DateFormat("hh:mm a").format(location.updateTD.toDate())}",
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      style: const TextStyle(
                           color: Colors.grey, fontWeight: FontWeight.bold),
                     )
                   ],

@@ -7,6 +7,8 @@ class HomeState extends Equatable {
   final bool locationEnabled;
   final StateStatus getAdBannerStatus;
   final StateStatus getLocationStatus;
+  final StateStatus getLocationFromDatabaseStatus;
+  final StateStatus updateLocationToDatabaseStatus;
   final CommonError error;
 
   const HomeState({
@@ -16,6 +18,8 @@ class HomeState extends Equatable {
     this.locationEnabled = false,
     this.getAdBannerStatus = StateStatus.initial,
     this.getLocationStatus = StateStatus.initial,
+    this.getLocationFromDatabaseStatus = StateStatus.initial,
+    this.updateLocationToDatabaseStatus = StateStatus.initial,
     this.error = const CommonError(),
   });
 
@@ -26,6 +30,8 @@ class HomeState extends Equatable {
     bool? locationEnabled,
     StateStatus? getAdBannerStatus,
     StateStatus? getLocationStatus,
+    StateStatus? getLocationFromDatabaseStatus,
+    StateStatus? updateLocationToDatabaseStatus,
     CommonError? error,
   }) {
     return HomeState(
@@ -35,6 +41,10 @@ class HomeState extends Equatable {
       locationEnabled: locationEnabled ?? this.locationEnabled,
       getAdBannerStatus: getAdBannerStatus ?? this.getAdBannerStatus,
       getLocationStatus: getLocationStatus ?? this.getLocationStatus,
+      getLocationFromDatabaseStatus:
+          getLocationFromDatabaseStatus ?? this.getLocationFromDatabaseStatus,
+      updateLocationToDatabaseStatus:
+          updateLocationToDatabaseStatus ?? this.updateLocationToDatabaseStatus,
       error: error ?? this.error,
     );
   }
@@ -48,6 +58,8 @@ class HomeState extends Equatable {
         locationEnabled,
         getAdBannerStatus,
         getLocationStatus,
+        getLocationFromDatabaseStatus,
+        updateLocationToDatabaseStatus,
         error
       ];
 }

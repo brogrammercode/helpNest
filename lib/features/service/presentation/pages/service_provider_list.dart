@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
+import 'package:helpnest/features/service/data/models/service_model.dart';
+import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 
 class ServiceProviderList extends StatefulWidget {
@@ -20,6 +22,7 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
       builder: (context, state) {
         final service =
             state.services.where((s) => s.id == state.serviceID).first;
+        final providers = state.serviceProviders;
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -46,14 +49,22 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
                 ),
                 _buildSection(
                   title: "Service Provider Near You",
-                  itemCount: 5,
-                  itemBuilder: (context, index) => _buildPersonTile(index != 4),
+                  itemCount: providers.length,
+                  itemBuilder: (context, index) => _buildPersonTile(
+                    showDivider: index != (providers.length - 1),
+                    provider: providers[index],
+                    service: service,
+                  ),
                 ),
                 SizedBox(height: 20.h),
                 _buildSection(
                   title: "Top Plumbers",
-                  itemCount: 3,
-                  itemBuilder: (context, index) => _buildPersonTile(index != 2),
+                  itemCount: providers.length,
+                  itemBuilder: (context, index) => _buildPersonTile(
+                    showDivider: index != (providers.length - 1),
+                    provider: providers[index],
+                    service: service,
+                  ),
                 ),
               ],
             ),
@@ -70,7 +81,9 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: itemCount == 0
+          ? []
+          : [
         Padding(
           padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.h),
           child: Text(
@@ -92,7 +105,16 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
     );
   }
 
-  Widget _buildPersonTile(bool showDivider) {
+  Widget _buildPersonTile(
+      {required bool showDivider,
+      required FindServiceProviderParams provider,
+      required ServiceModel service}) {
+    num avgRating = 5.0;
+    if (provider.feedbacks.isNotEmpty) {
+      double totalRating =
+          provider.feedbacks.fold(0, (sum, feedback) => sum + feedback.rating);
+      avgRating = totalRating / provider.feedbacks.length;
+    } 
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -108,19 +130,17 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
         children: [
           Row(
             children: [
-              _buildProfileImage(
-                "https://cdn.dribbble.com/users/6477965/screenshots/20111844/media/c7df4e1b8e3966abe967c8aa916eba86.jpg",
-              ),
+              _buildProfileImage(provider.user.image),
               SizedBox(width: 10.w),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Credence Anderson",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      provider.user.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text("Plumber\t\t\t\t\t4.7 ★"),
+                    Text("${service.name}\t\t\t\t\t$avgRating ★"),
                   ],
                 ),
               ),
@@ -134,9 +154,9 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor),
                   ),
-                  const Text(
-                    "5.6 Km",
-                    style: TextStyle(
+                  Text(
+                    "${provider.distance} Km",
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.grey),
                   ),
                 ],
@@ -147,8 +167,8 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
           const Text("Last Location",
               style: TextStyle(fontWeight: FontWeight.bold)),
           SizedBox(height: 5.h),
-          const Text(
-              "Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016"),
+          Text(
+              "${provider.user.location.area}, ${provider.user.location.city}, ${provider.user.location.state}, ${provider.user.location.country} Pin - ${provider.user.location.pincode}"),
           if (showDivider) ...[
             SizedBox(height: 20.h),
             Divider(color: Colors.grey.withOpacity(.3)),

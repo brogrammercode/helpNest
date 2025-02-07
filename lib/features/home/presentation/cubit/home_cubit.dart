@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,16 +10,21 @@ import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/home/data/models/ad_banner_model.dart';
 import 'package:helpnest/features/home/domain/repo/ad_banner_repo.dart';
+import 'package:helpnest/features/home/domain/repo/home_remote_repo.dart';
 import 'package:intl/intl.dart';
 
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final AdBannerRepo _adBannerRepo;
+  final HomeRemoteRepo _homeRemoteRepo;
   StreamSubscription? _isLocationEnabledSubscription;
 
-  HomeCubit({required AdBannerRepo adBannerRepo})
+  HomeCubit(
+      {required AdBannerRepo adBannerRepo,
+      required HomeRemoteRepo homeRemoteRepo})
       : _adBannerRepo = adBannerRepo,
+        _homeRemoteRepo = homeRemoteRepo,
         super(const HomeState()) {
     initializeIsLocationEnabledListener();
   }
@@ -82,6 +88,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(state.copyWith(
           lastLocation: [lastLocation],
           getLocationStatus: StateStatus.success));
+      await updateLocationToDatabase(location: lastLocation);
       if (state.lastLocation.isNotEmpty) {
         log("${state.lastLocation} at ---${state.lastLocation.first.geopoint.latitude}, ${state.lastLocation.first.geopoint.longitude}--- updated on ${DateFormat().format(state.lastLocation.first.updateTD.toDate())}");
       }
@@ -90,6 +97,46 @@ class HomeCubit extends Cubit<HomeState> {
       emit(state.copyWith(getLocationStatus: StateStatus.failure));
     }
   }
+
+  Future<void> updateLocationToDatabase(
+      {required UserLocationModel location}) async {
+    try {
+      emit(state.copyWith(updateLocationToDatabaseStatus: StateStatus.loading));
+      await _homeRemoteRepo.updateLocationToDatabase(location: location);
+      emit(state.copyWith(updateLocationToDatabaseStatus: StateStatus.success));
+    } catch (e) {
+      emit(state.copyWith(
+          updateLocationToDatabaseStatus: StateStatus.failure,
+          error: CommonError(consoleMessage: e.toString())));
+    }
+  }
+
+  Future<void> getLocationFromDatabase() async {
+    try {
+      emit(state.copyWith(getLocationFromDatabaseStatus: StateStatus.loading));
+      final location = await _homeRemoteRepo.getLocationFromDatabase();
+      emit(state.copyWith(
+          position: location != null && location.geopoint.latitude != 0
+              ? Position(
+                  longitude: location.geopoint.longitude,
+                  latitude: location.geopoint.latitude,
+                  timestamp: Timestamp.now().toDate(),
+                  accuracy: 100,
+                  altitude: 100,
+                  altitudeAccuracy: 100,
+                  heading: 100,
+                  headingAccuracy: 100,
+                  speed: 100,
+                  speedAccuracy: 100)
+              : null,
+          lastLocation: location != null ? [location] : [],
+          getLocationFromDatabaseStatus: StateStatus.success));
+    } catch (e) {
+      emit(state.copyWith(
+          getLocationFromDatabaseStatus: StateStatus.failure,
+          error: CommonError(consoleMessage: e.toString())));
+    }
+  } 
 
   @override
   Future<void> close() {

@@ -29,11 +29,13 @@ class _HomeControllerState extends State<HomeController> {
   }
 
   void _init() async {
+    context.read<HomeCubit>().getLocationFromDatabase();
     context.read<ServiceCubit>().getServices();
     context.read<SearchCubit>().getSearchKeywords();
     context.read<ProfileCubit>().getAppFeedback();
     context.read<HomeCubit>().initializeIsLocationEnabledListener();
     context.read<HomeCubit>().getAdBanner(position: null);
+    
   }
 
   @override

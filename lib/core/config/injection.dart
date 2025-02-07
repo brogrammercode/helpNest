@@ -3,7 +3,9 @@ import 'package:helpnest/features/auth/data/data_source/auth_remote_ds.dart';
 import 'package:helpnest/features/auth/domain/repo/auth_repo.dart';
 import 'package:helpnest/features/auth/presentation/cubit/auth_state.dart';
 import 'package:helpnest/features/home/data/data_source/ad_banner_remote_ds.dart';
+import 'package:helpnest/features/home/data/data_source/home_remote_ds.dart';
 import 'package:helpnest/features/home/domain/repo/ad_banner_repo.dart';
+import 'package:helpnest/features/home/domain/repo/home_remote_repo.dart';
 import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/profile/data/data_source/profile_remote_ds.dart';
 import 'package:helpnest/features/profile/domain/repo/profile_repo.dart';
@@ -36,7 +38,9 @@ class Injections {
 
     // home
     _getIt.registerFactory<AdBannerRepo>(() => AdBannerRemoteDs());
-    _getIt.registerFactory<HomeCubit>(() => HomeCubit(adBannerRepo: _getIt()));
+    _getIt.registerFactory<HomeRemoteRepo>(() => HomeRemoteDs());
+    _getIt.registerFactory<HomeCubit>(
+        () => HomeCubit(adBannerRepo: _getIt(), homeRemoteRepo: _getIt()));
 
     // search
     _getIt.registerFactory<SearchLocalRepo>(() => SearchLocalDs());
