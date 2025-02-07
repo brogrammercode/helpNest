@@ -226,6 +226,9 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 20.h),
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          fixedSize: Size(330.r, 55.r),
+        ),
         onPressed: () {
           if (featureController.text.isEmpty ||
               descriptionController.text.isEmpty) {

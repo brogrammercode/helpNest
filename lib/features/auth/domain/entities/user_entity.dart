@@ -33,6 +33,7 @@ class UserLocationEntity {
   final String country;
   final String continent;
   final GeoPoint geopoint;
+  final Timestamp updateTD;
 
   UserLocationEntity(
       {required this.city,
@@ -42,5 +43,7 @@ class UserLocationEntity {
       required this.state,
       required this.country,
       required this.continent,
-      required this.geopoint});
+    required this.geopoint,
+    required this.updateTD,
+  });
 }

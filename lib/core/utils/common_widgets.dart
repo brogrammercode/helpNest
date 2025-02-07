@@ -33,7 +33,7 @@ class CustomTextFormField extends StatelessWidget {
     this.suffixIcon,
     this.onTap,
     this.validator,
-    this.underlineBorderedTextField = false,
+    this.underlineBorderedTextField = true,
   });
 
   @override
@@ -144,7 +144,8 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
           badgeColor: widget.circularMode
               ? Theme.of(context).primaryColor
               : Colors.white),
-      showBadge: widget.image != null || widget.imageUrl != null,
+      showBadge: (widget.image != null || widget.imageUrl != null) &&
+          (!widget.readOnly),
       onTap: () {
         setState(() {
           widget.image = null;
@@ -163,7 +164,7 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
             shape: widget.circularMode ? BoxShape.circle : BoxShape.rectangle,
             color: Colors.grey.withOpacity(.1),
           ),
-          padding: widget.circularMode
+          padding: widget.circularMode || widget.readOnly
               ? EdgeInsets.zero
               : EdgeInsets.all(
               widget.image != null || widget.imageUrl != null ? 10.w : 0),

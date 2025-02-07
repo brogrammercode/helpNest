@@ -1,10 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/core/config/color.dart';
+import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -166,4 +170,51 @@ Future<void> commonBottomSheet({
       );
     },
   );
+}
+
+Future<UserLocationModel> getUserLocationFromPosition(Position position) async {
+  try {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks.first;
+
+      String continent = _getContinentFromCountry(place.country ?? "");
+
+      return UserLocationModel(
+        city: place.subAdministrativeArea ?? "",
+        area: place.locality ?? "",
+        pincode: place.postalCode ?? "",
+        locality: place.thoroughfare ?? "",
+        state: place.administrativeArea ?? "",
+        country: place.country ?? "",
+        continent: continent,
+        geopoint: GeoPoint(position.latitude, position.longitude),
+        updateTD: Timestamp.now(),
+      );
+    } else {
+      throw Exception("No placemarks found");
+    }
+  } catch (e) {
+    log("ERROR_GETTING_LOCATION_DATA: $e");
+    rethrow;
+  }
+}
+
+// 🔹 Helper function to get continent based on country
+String _getContinentFromCountry(String country) {
+  const Map<String, String> countryToContinent = {
+    "India": "Asia",
+    "United States": "North America",
+    "Canada": "North America",
+    "Brazil": "South America",
+    "United Kingdom": "Europe",
+    "Germany": "Europe",
+    "Australia": "Australia",
+    "South Africa": "Africa",
+    "Japan": "Asia",
+  };
+
+  return countryToContinent[country] ?? "Unknown";
 }

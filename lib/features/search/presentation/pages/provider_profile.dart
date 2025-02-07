@@ -18,6 +18,9 @@ class _ProviderProfileState extends State<ProviderProfile> {
       floatingActionButton: Padding(
         padding: EdgeInsets.symmetric(vertical: 30.h),
         child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            fixedSize: Size(330.r, 55.r),
+          ),
           onPressed: () {},
           child: Text(
             "Order Service",

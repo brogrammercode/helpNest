@@ -82,6 +82,7 @@ class UserLocationModel extends UserLocationEntity {
     required super.country,
     required super.continent,
     required super.geopoint,
+    required super.updateTD,
   });
 
   factory UserLocationModel.fromJson(Map<String, dynamic> json) {
@@ -94,6 +95,7 @@ class UserLocationModel extends UserLocationEntity {
       country: json['country'] ?? '',
       continent: json['continent'] ?? '',
       geopoint: json['geopoint'] ?? const GeoPoint(0, 0),
+      updateTD: json['updateTD'] ?? Timestamp.now(),
     );
   }
 
@@ -107,12 +109,13 @@ class UserLocationModel extends UserLocationEntity {
       'country': country,
       'continent': continent,
       'geopoint': geopoint,
+      'updateTD': updateTD,
     };
   }
 
   @override
   String toString() {
-    return 'UserLocationModel(city: $city, area: $area, pincode: $pincode, locality: $locality, state: $state, country: $country, continent: $continent, geopoint: $geopoint)';
+    return 'UserLocationModel(city: $city, area: $area, pincode: $pincode, locality: $locality, state: $state, country: $country, continent: $continent, geopoint: $geopoint, updateTD: $updateTD)';
   }
 
   UserLocationModel copyWith({
@@ -124,6 +127,7 @@ class UserLocationModel extends UserLocationEntity {
     String? country,
     String? continent,
     GeoPoint? geopoint,
+    Timestamp? updateTD,
   }) {
     return UserLocationModel(
       city: city ?? this.city,
@@ -134,6 +138,7 @@ class UserLocationModel extends UserLocationEntity {
       country: country ?? this.country,
       continent: continent ?? this.continent,
       geopoint: geopoint ?? this.geopoint,
+      updateTD: updateTD ?? this.updateTD,
     );
   }
 }

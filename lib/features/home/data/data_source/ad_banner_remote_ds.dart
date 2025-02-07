@@ -11,7 +11,7 @@ class AdBannerRemoteDs implements AdBannerRepo {
     try {
       final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
       final querySnapshot =
-          await FirebaseFirestore.instance.collection('ad_banners').get();
+          await FirebaseFirestore.instance.collection('ad_banner').get();
 
       if (querySnapshot.docs.isEmpty) {
         return [];
@@ -61,7 +61,7 @@ class AdBannerRemoteDs implements AdBannerRepo {
     required String? currentUserId,
   }) {
     if (particularID.isEmpty) {
-      return true; // Show to all if particularID is empty.
+      return true; 
     }
     return currentUserId != null && particularID.contains(currentUserId);
   }

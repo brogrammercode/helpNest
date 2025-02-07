@@ -57,6 +57,9 @@ class _BecomeProviderPageState extends State<BecomeProviderPage> {
           floatingActionButton: Padding(
             padding: EdgeInsets.symmetric(vertical: 20.h),
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                fixedSize: Size(330.r, 55.r),
+              ),
               onPressed: state.requestServiceProviderAccessStatus ==
                       StateStatus.loading
                   ? () {}

@@ -128,6 +128,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 ),
                 SizedBox(height: 20.h),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: Size(330.r, 55.r),
+                  ),
                   onPressed: state.status == StateStatus.loading
                       ? () => setState(() => skipped = true)
                       : _signIn,

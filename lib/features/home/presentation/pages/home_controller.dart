@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/order/presentation/pages/history_page.dart';
 import 'package:helpnest/features/home/presentation/pages/home_screen.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
@@ -31,6 +32,8 @@ class _HomeControllerState extends State<HomeController> {
     context.read<ServiceCubit>().getServices();
     context.read<SearchCubit>().getSearchKeywords();
     context.read<ProfileCubit>().getAppFeedback();
+    context.read<HomeCubit>().initializeIsLocationEnabledListener();
+    context.read<HomeCubit>().getAdBanner(position: null);
   }
 
   @override

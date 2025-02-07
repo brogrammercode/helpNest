@@ -164,7 +164,8 @@ class _ReportSafetyEmergencyPageState extends State<ReportSafetyEmergencyPage> {
                             state: "state",
                             country: "country",
                             continent: "continent",
-                            geopoint: const GeoPoint(0, 0)),
+                            geopoint: const GeoPoint(0, 0),
+                            updateTD: Timestamp.now()),
                         reportedBy:
                             FirebaseAuth.instance.currentUser?.uid ?? "",
                         adminResponse: "",

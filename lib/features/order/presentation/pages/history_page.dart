@@ -189,6 +189,9 @@ class OrderCard extends StatelessWidget {
             if (buttonText != null && onButtonPressed != null) ...[
               SizedBox(height: 20.h),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(330.r, 55.r),
+                ),
                 onPressed: onButtonPressed,
                 child: Text(
                   buttonText!,
