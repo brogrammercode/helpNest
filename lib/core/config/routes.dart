@@ -12,6 +12,7 @@ import 'package:helpnest/features/profile/presentation/pages/report_safety_emerg
 import 'package:helpnest/features/profile/presentation/pages/send_feedback_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/support_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/terms_condition.dart';
+import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
 import 'package:helpnest/features/service/presentation/pages/service_provider_list.dart';
 
 class AppRoutes {
@@ -33,6 +34,9 @@ class AppRoutes {
 
   // service
   static const String serviceProviderListPage = '/serviceProviderListPage';
+
+  // search
+  static const String providerProfile = '/providerProfile';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -71,9 +75,17 @@ class AppRoutes {
         return MaterialPageRoute(
             builder: (_) => const ReportSafetyEmergencyPage());
         
-      // auth
+      // service
       case serviceProviderListPage:
         return MaterialPageRoute(builder: (_) => const ServiceProviderList());
+        
+      // search
+      case providerProfile:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+            builder: (_) => ProviderProfile(
+                  provider: args?['provider'],
+                ));
 
       // case consumerDetail:
       //   final args = settings.arguments as Map<String, dynamic>?;

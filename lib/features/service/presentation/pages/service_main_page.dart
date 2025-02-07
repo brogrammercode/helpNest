@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
+import 'package:helpnest/core/config/routes.dart';
 
 class ServiceMainPage extends StatefulWidget {
   const ServiceMainPage({super.key});
@@ -87,12 +87,7 @@ class _ServiceMainPageState extends State<ServiceMainPage> {
   Widget _buildPersonTile(bool showDivider) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const ProviderProfile(),
-          ),
-        );
+        Navigator.pushNamed(context, AppRoutes.providerProfile);
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,

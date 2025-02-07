@@ -1,16 +1,43 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/features/auth/data/models/user_model.dart';
+import 'package:helpnest/features/profile/data/models/feedback_model.dart';
+import 'package:helpnest/features/service/data/models/service_model.dart';
+import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
+import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 
 class ProviderProfile extends StatefulWidget {
-  const ProviderProfile({super.key});
+  final FindServiceProviderParams provider;
+  const ProviderProfile({super.key, required this.provider});
 
   @override
   State<ProviderProfile> createState() => _ProviderProfileState();
 }
 
 class _ProviderProfileState extends State<ProviderProfile> {
+  ServiceModel? service;
+  num avgRating = 5;
+
+  @override
+  void initState() {
+    service = context
+        .read<ServiceCubit>()
+        .state
+        .services
+        .firstWhere((e) => e.id == widget.provider.serviceProvider.serviceID);
+    if (widget.provider.feedbacks.isNotEmpty) {
+      double totalRating = widget.provider.feedbacks
+          .fold(0, (sum, feedback) => sum + feedback.rating);
+      avgRating = totalRating / widget.provider.feedbacks.length;
+    }
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,17 +62,20 @@ class _ProviderProfileState extends State<ProviderProfile> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildProfileImages(),
+            _buildProfileImages(
+                providerImage: widget.provider.user.image,
+                serviceImage: service?.logo ?? ""),
             SizedBox(height: 10.h),
-            const Text("Credence Anderson",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const Text("Plumber"),
+            Text(widget.provider.user.name,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(service?.name ?? "Service"),
             SizedBox(height: 10.h),
             _buildRatingRow(false),
             SizedBox(height: 30.h),
             _buildDetailsSection(context),
-            _buildLocationSection(),
-            _buildReviewsSection(context),
+            _buildLocationSection(location: widget.provider.user.location),
+            _buildReviewsSection(
+                context: context, feedbacks: widget.provider.feedbacks),
             SizedBox(height: 100.h),
           ],
         ),
@@ -53,7 +83,8 @@ class _ProviderProfileState extends State<ProviderProfile> {
     );
   }
 
-  Widget _buildProfileImages() {
+  Widget _buildProfileImages(
+      {required String providerImage, required String serviceImage}) {
     return Center(
       child: SizedBox(
         width: 200.w,
@@ -62,15 +93,11 @@ class _ProviderProfileState extends State<ProviderProfile> {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: _buildCircularImage(
-                "https://cdn.dribbble.com/userupload/16281153/file/original-b6ff14bfc931d716c801ea7e250965ce.png?resize=1600x1200&vertical=center",
-              ),
+              child: _buildCircularImage(imageUrl: serviceImage, padded: true),
             ),
             Align(
               alignment: Alignment.centerRight,
-              child: _buildCircularImage(
-                "https://cdn.dribbble.com/userupload/16366138/file/original-c35bbf68ba08abeb0509f09de77dd62b.jpg?resize=1600x1200&vertical=center",
-              ),
+              child: _buildCircularImage(imageUrl: providerImage),
             ),
           ],
         ),
@@ -78,13 +105,14 @@ class _ProviderProfileState extends State<ProviderProfile> {
     );
   }
 
-  Widget _buildCircularImage(String imageUrl) {
+  Widget _buildCircularImage({required String imageUrl, bool padded = false}) {
     return Container(
       alignment: Alignment.center,
       height: 125.h,
       width: 125.h,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
+        color: Colors.white,
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
         ],
@@ -92,11 +120,17 @@ class _ProviderProfileState extends State<ProviderProfile> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
-        child: CachedNetworkImage(
-          height: 125.h,
-          width: 125.h,
-          fit: BoxFit.cover,
-          imageUrl: imageUrl,
+        child: Container(
+          padding: EdgeInsets.all(padded ? 20.r : 0),
+          child: CachedNetworkImage(
+            height: 125.h,
+            width: 125.h,
+            fit: BoxFit.cover,
+            errorWidget: (c, u, e) {
+              return const Icon(Iconsax.gallery);
+            },
+            imageUrl: imageUrl,
+          ),
         ),
       ),
     );
@@ -178,7 +212,7 @@ class _ProviderProfileState extends State<ProviderProfile> {
     );
   }
 
-  Widget _buildLocationSection() {
+  Widget _buildLocationSection({required UserLocationModel location}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
       child: Column(
@@ -192,30 +226,32 @@ class _ProviderProfileState extends State<ProviderProfile> {
             ],
           ),
           SizedBox(height: 5.h),
-          const Text(
-            "Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016",
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Text(
+            "${location.area}, ${location.city}, ${location.state}, ${location.country} Pin - ${location.pincode}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildReviewsSection(BuildContext context) {
+  Widget _buildReviewsSection(
+      {required BuildContext context, required List<FeedbackModel> feedbacks}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Reviews - 100+"),
+          Text(feedbacks.isNotEmpty ? "Reviews - ${feedbacks.length}+" : ""),
           SizedBox(height: 20.h),
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.zero,
-            itemCount: 6,
+            itemCount: feedbacks.length,
             itemBuilder: (context, index) {
-              return _buildReviewCard(context);
+              return _buildReviewCard(
+                  context: context, feedback: feedbacks[index]);
             },
           ),
         ],
@@ -223,7 +259,8 @@ class _ProviderProfileState extends State<ProviderProfile> {
     );
   }
 
-  Widget _buildReviewCard(BuildContext context) {
+  Widget _buildReviewCard(
+      {required BuildContext context, required FeedbackModel feedback}) {
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
@@ -234,23 +271,24 @@ class _ProviderProfileState extends State<ProviderProfile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Johhn Batlar",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                feedback.title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text("Jan 11"),
+              Text(DateFormat("mmm dd").format(feedback.creationTD.toDate())),
             ],
           ),
           SizedBox(height: 10.h),
           Row(
-            children: List.generate(5, (index) => _buildStarIcon(true)),
+            children: List.generate(
+                feedback.rating.toInt(), (index) => _buildStarIcon(true)),
           ),
           SizedBox(height: 10.h),
-          const Text(
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make.",
+          Text(
+            feedback.description,
           ),
         ],
       ),

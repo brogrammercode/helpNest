@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/features/search/presentation/cubit/search_cubit.dart';
-import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
 import 'package:iconsax/iconsax.dart';
 
 class SearchPage extends StatefulWidget {
@@ -153,12 +153,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildPersonTile() {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const ProviderProfile(),
-          ),
-        );
+        Navigator.pushNamed(context, AppRoutes.providerProfile);
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -191,12 +186,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildKeywordTile({bool bottomSpace = true}) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const ProviderProfile(),
-          ),
-        );
+        Navigator.pushNamed(context, AppRoutes.providerProfile);
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,

@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:helpnest/features/search/presentation/pages/provider_profile.dart';
+import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
 import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
@@ -117,11 +117,10 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
     } 
     return InkWell(
       onTap: () {
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => const ProviderProfile(),
-          ),
+          AppRoutes.providerProfile,
+          arguments: {'provider': provider},
         );
       },
       child: Column(

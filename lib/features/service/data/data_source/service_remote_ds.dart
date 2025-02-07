@@ -95,7 +95,7 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
       String providerId) async {
     QuerySnapshot feedbackSnapshot = await firestore
         .collection('feedbacks')
-        .where('title', isEqualTo: providerId)
+        .where('category', isEqualTo: providerId)
         .get();
 
     return feedbackSnapshot.docs
