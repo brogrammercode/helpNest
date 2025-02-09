@@ -1,8 +1,14 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:helpnest/features/order/presentation/pages/past_order.dart';
+import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
+import 'package:helpnest/features/order/presentation/pages/track_page.dart';
+import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -14,68 +20,106 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              OrderCard(
-                name: "Credence Anderson",
-                role: "Plumber",
-                location:
-                    "Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016",
-                date: "25 Dec, 2024",
-                fee: "₹ 500",
-                imageUrl:
-                    "https://cdn.dribbble.com/users/6477965/screenshots/20111844/media/c7df4e1b8e3966abe967c8aa916eba86.jpg",
-                buttonText: "Track Order",
-                onButtonPressed: () {
-                  // Add tracking navigation logic
-                },
+    return BlocConsumer<OrderCubit, OrderState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        log("ORDER_COUNT: ${state.orders.length}");
+        final activeOrders = state.orders
+            .where((e) => e.order.status != "Order Completed")
+            .toList()
+          ..sort((a, b) => a.order.orderTD.compareTo(b.order.orderTD));
+
+        final pastOrders = state.orders
+            .where((e) => e.order.status == "Order Completed")
+            .toList()
+          ..sort((a, b) => b.order.orderTD.compareTo(a.order.orderTD));
+
+        return Scaffold(
+          appBar: _buildAppBar(context),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: activeOrders.length,
+                      itemBuilder: (context, i) {
+                        final order = activeOrders[i];
+                        final service = context
+                            .read<ServiceCubit>()
+                            .state
+                            .services
+                            .where((a) => a.id == order.order.serviceID)
+                            .toList()
+                            .first;
+                        final location = order.order.consumerLocation;
+                        return OrderCard(
+                          name: order.user.name,
+                          role: service.name,
+                          location:
+                              "${location.area}, ${location.city}, ${location.state}, ${location.country} Pin - ${location.pincode}",
+                          date: DateFormat("dd MMM, yyyy")
+                              .format(order.order.orderTD.toDate()),
+                          fee: "₹ 500",
+                          imageUrl:
+                             order.user.image,
+                          buttonText: "Track Order",
+                          onButtonPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        TrackPage(orderID: order.order.id)));
+                          },
+                        );
+                      }),
+                  if (pastOrders.isNotEmpty) ...[
+                    Text(
+                      "Past Orders",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 20.h),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: pastOrders.length,
+                        itemBuilder: (context, i) {
+                          final order = activeOrders[i];
+                          final service = context
+                              .read<ServiceCubit>()
+                              .state
+                              .services
+                              .where((a) => a.id == order.order.serviceID)
+                              .toList()
+                              .first;
+                          final location = order.order.consumerLocation;
+                          return OrderCard(
+                            name: order.user.name,
+                            role: service.name,
+                            location:
+                                "${location.area}, ${location.city}, ${location.state}, ${location.country} Pin - ${location.pincode}",
+                            date: DateFormat("dd MMM, yyyy")
+                                .format(order.order.orderTD.toDate()),
+                            fee: "₹ 500",
+                            imageUrl: order.user.image,
+                            onButtonPressed: () {
+                              // Add tracking navigation logic
+                            },
+                          );
+                        }),
+                  ],
+                ],
               ),
-              SizedBox(height: 20.h),
-              Text(
-                "Past Orders",
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20.h),
-              OrderCard(
-                name: "Travis Scott",
-                role: "Carpenter",
-                location:
-                    "Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016",
-                date: "25 Dec, 2024",
-                fee: "₹ 670",
-                imageUrl:
-                    "https://cdn.dribbble.com/users/46743/screenshots/6357861/cs19_mascot-01.jpg",
-                onCardTapped: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PastOrder()),
-                  );
-                },
-              ),
-              SizedBox(height: 20.h),
-              const OrderCard(
-                name: "John Lee",
-                role: "Electrician",
-                location:
-                    "Akshya Nagar 1st Block 1st Cross, Rammurthy nagar, Bangalore-560016",
-                date: "25 Dec, 2024",
-                fee: "₹ 500",
-                imageUrl:
-                    "https://cdn.dribbble.com/userupload/16609994/file/original-17ddc3a453daaa783980c5529232f80a.png?resize=1600x1200&vertical=center",
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -135,6 +179,7 @@ class OrderCard extends StatelessWidget {
       onTap: onCardTapped,
       borderRadius: BorderRadius.circular(10),
       child: Container(
+        margin: EdgeInsets.only(bottom: 20.h),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(10),
@@ -191,12 +236,21 @@ class OrderCard extends StatelessWidget {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   fixedSize: Size(330.r, 55.r),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r))
                 ),
                 onPressed: onButtonPressed,
-                child: Text(
-                  buttonText!,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.location, size: 20.sp),
+                    SizedBox(width: 20.w),
+                    Text(
+                      buttonText!,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
             ],

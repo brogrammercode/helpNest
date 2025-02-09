@@ -33,6 +33,10 @@ class HomeCubit extends Cubit<HomeState> {
     emit(state.copyWith(position: position));
   }
 
+  Future<void> updateBottomNavIndex({required int index}) async {
+    emit(state.copyWith(bottomNavIndex: index));
+  }
+
   Future<void> getAdBanner({required Position? position}) async {
     try {
       emit(state.copyWith(getAdBannerStatus: StateStatus.loading));
@@ -50,6 +54,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   void initializeIsLocationEnabledListener() async {
     final bool isLocationEnabled = await Geolocator.isLocationServiceEnabled();
+    // also check if location permission is not set to don't allow
     emit(state.copyWith(locationEnabled: isLocationEnabled));
 
     if (isLocationEnabled) {
@@ -116,7 +121,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(state.copyWith(getLocationFromDatabaseStatus: StateStatus.loading));
       final location = await _homeRemoteRepo.getLocationFromDatabase();
       emit(state.copyWith(
-          position: location != null && location.geopoint.latitude != 0
+          position: location != null &&
+                  location.geopoint.latitude != 0 &&
+                  location.state.isNotEmpty
               ? Position(
                   longitude: location.geopoint.longitude,
                   latitude: location.geopoint.latitude,
@@ -129,7 +136,11 @@ class HomeCubit extends Cubit<HomeState> {
                   speed: 100,
                   speedAccuracy: 100)
               : null,
-          lastLocation: location != null ? [location] : [],
+          lastLocation: location != null &&
+                  location.geopoint.latitude != 0 &&
+                  location.state.isNotEmpty
+              ? [location]
+              : [],
           getLocationFromDatabaseStatus: StateStatus.success));
     } catch (e) {
       emit(state.copyWith(

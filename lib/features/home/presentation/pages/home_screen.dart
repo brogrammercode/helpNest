@@ -5,8 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
+import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/core/utils/common_widgets.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
@@ -93,6 +95,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleLocation({UserLocationModel? location}) async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      await Geolocator.requestPermission();
+    }
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
@@ -110,9 +117,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (activeWidget != null) {
       return ElevatedButton(
         onPressed: onPressed,
+        
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           padding: EdgeInsets.symmetric(horizontal: 20.w),
+          shadowColor: Colors.transparent,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50.r),
@@ -405,7 +414,7 @@ class LocationBottomSheet extends StatelessWidget {
             state.lastLocation.isNotEmpty ? state.lastLocation.first : null;
         return Container(
           width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
           padding: EdgeInsets.all(20.w),
           decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
@@ -430,10 +439,11 @@ class LocationBottomSheet extends StatelessWidget {
               if (location != null) ...[
                 SizedBox(height: 10.h),
                 CustomImageUploader(
-                    imageUrl: "https://api.mapbox"
-                        ".com/styles/v1/mapbox/streets-v11/static/pin-l+006600(${location.geopoint.longitude},"
-                        "${location.geopoint.latitude})"
-                        "/auto/800x800?padding=120&access_token=pk.eyJ1Ijoic2F1cmFiaC10ZWNoMjYwMyIsImEiOiJjbDk4b2FwemQwcTU4M3BtdjYzNHNkc3d1In0.K3wmWSc7atSi-EqkGtKbwg",
+                    // imageUrl: "https://api.mapbox"
+                    //     ".com/styles/v1/mapbox/streets-v11/static/pin-l+006600(${location.geopoint.longitude},"
+                    //     "${location.geopoint.latitude})"
+                    //     "/auto/800x800?padding=120&access_token=pk.eyJ1Ijoic2F1cmFiaC10ZWNoMjYwMyIsImEiOiJjbDk4b2FwemQwcTU4M3BtdjYzNHNkc3d1In0.K3wmWSc7atSi-EqkGtKbwg",
+                    imageUrl: mapImage(points: [location.geopoint]),
                     readOnly: true,
                     onSelected: (image) {},
                     onCancel: () {}),

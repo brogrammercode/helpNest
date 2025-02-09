@@ -16,13 +16,14 @@ abstract class ServiceRemoteRepo {
 class FindServiceProviderParams {
   final ServiceProviderModel serviceProvider;
   final UserModel user;
+  final List<OrderModel> orders;
   final List<FeedbackModel> feedbacks;
   final double? distance;
 
-  FindServiceProviderParams(
-      {
+  FindServiceProviderParams({
     required this.serviceProvider,
     required this.user,
+    required this.orders,
     required this.feedbacks,
     this.distance,
   });

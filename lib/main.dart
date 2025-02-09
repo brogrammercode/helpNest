@@ -9,6 +9,7 @@ import 'package:helpnest/core/config/supabase_config.dart';
 import 'package:helpnest/core/config/theme.dart';
 import 'package:helpnest/features/auth/presentation/cubit/auth_state.dart';
 import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
+import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/search/presentation/cubit/search_cubit.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
@@ -35,6 +36,7 @@ class App extends StatelessWidget {
             create: (_) => Injections.get<ServiceCubit>()),
         BlocProvider<HomeCubit>(create: (_) => Injections.get<HomeCubit>()),
         BlocProvider<SearchCubit>(create: (_) => Injections.get<SearchCubit>()),
+        BlocProvider<OrderCubit>(create: (_) => Injections.get<OrderCubit>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(411.42857142857144, 843.4285714285714),

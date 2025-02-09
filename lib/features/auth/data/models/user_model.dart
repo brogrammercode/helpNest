@@ -5,6 +5,7 @@ class UserModel extends UserEntity {
   UserModel({
     required super.id,
     required super.name,
+    required super.email,
     required super.phoneNumber,
     required super.location,
     required super.image,
@@ -18,6 +19,7 @@ class UserModel extends UserEntity {
     return UserModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
+      email: json['email'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       location: UserLocationModel.fromJson(json['location'] ?? {}),
       image: json['image'] ?? '',
@@ -32,6 +34,7 @@ class UserModel extends UserEntity {
     return {
       'id': id,
       'name': name,
+      'email': email,
       'phoneNumber': phoneNumber,
       'location': location.toJson(),
       'image': image,
@@ -44,12 +47,13 @@ class UserModel extends UserEntity {
 
   @override
 String toString() {
-    return 'UserModel(id: $id, name: $name, phoneNumber: $phoneNumber, location: $location, image: $image, gender: $gender, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
+    return 'UserModel(id: $id, name: $name, email: $email, phoneNumber: $phoneNumber, location: $location, image: $image, gender: $gender, creationTD: $creationTD, createdBy: $createdBy, deactivate: $deactivate)';
   }
 
   UserModel copyWith({
     String? id,
     String? name,
+    String? email,
     String? phoneNumber,
     UserLocationModel? location,
     String? image,
@@ -61,6 +65,7 @@ String toString() {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       location: location ?? this.location,
       image: image ?? this.image,
@@ -70,6 +75,7 @@ String toString() {
       deactivate: deactivate ?? this.deactivate,
     );
   }
+
 }
 
 class UserLocationModel extends UserLocationEntity {

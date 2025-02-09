@@ -1,7 +1,13 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart'; // for debugPrint
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/order/domain/repo/order_repo.dart';
+import 'package:helpnest/features/profile/data/models/feedback_model.dart';
+import 'package:helpnest/features/profile/data/models/service_provier_model.dart';
 
 class OrderRemoteDs implements OrderRepo {
   @override
@@ -18,20 +24,76 @@ class OrderRemoteDs implements OrderRepo {
   }
 
   @override
-  Future<List<OrderModel>> getOrders() async {
+Stream<List<GetOrderParam>> streamOrders() {
     try {
-      final QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection("orders").get();
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) return Stream.value([]);
 
-      // Convert QuerySnapshot into List<OrderModel>
-      final List<OrderModel> orders = querySnapshot.docs.map((doc) {
-        return OrderModel.fromJson(doc.data() as Map<String, dynamic>);
+      return FirebaseFirestore.instance
+          .collection("orders")
+          .where("consumerID", isEqualTo: userId)
+          .snapshots()
+          .asyncMap((querySnapshot) async {
+        if (querySnapshot.docs.isEmpty) return [];
+
+        final providerIDs = querySnapshot.docs
+            .map((doc) => doc["providerID"] as String)
+            .toSet();
+
+        if (providerIDs.isEmpty) return [];
+
+        final providerSnapshots = await Future.wait([
+          FirebaseFirestore.instance
+              .collection("service_providers")
+              .where(FieldPath.documentId, whereIn: providerIDs.toList())
+              .get(),
+          FirebaseFirestore.instance
+              .collection("users")
+              .where(FieldPath.documentId, whereIn: providerIDs.toList())
+              .get(),
+          FirebaseFirestore.instance
+              .collection("feedbacks")
+              .where("category", whereIn: providerIDs.toList())
+              .where("title", isEqualTo: userId)
+              .get(),
+        ]);
+
+        final providerDataMap = {
+          for (var doc in providerSnapshots[0].docs)
+            doc.id: ServiceProviderModel.fromJson(doc.data()),
+        };
+        final userDataMap = {
+          for (var doc in providerSnapshots[1].docs)
+            doc.id: UserModel.fromJson(doc.data()),
+        };
+        final feedbackMap = <String, List<FeedbackModel>>{};
+
+        for (var doc in providerSnapshots[2].docs) {
+          final feedback = FeedbackModel.fromJson(doc.data());
+          final providerID = doc["category"];
+          feedbackMap.putIfAbsent(providerID, () => []).add(feedback);
+        }
+
+        return querySnapshot.docs.map((doc) {
+          final orderData = OrderModel.fromJson(doc.data());
+          final providerID = orderData.providerID;
+
+          return GetOrderParam(
+            provider: providerDataMap[providerID] ??
+                ServiceProviderModel.fromJson({}),
+            user: userDataMap[providerID] ?? UserModel.fromJson({}),
+            order: orderData,
+            feedback: feedbackMap[providerID] ?? [],
+          );
       }).toList();
-
-      return orders;
+      });
     } catch (e) {
-      debugPrint("ORDER_REMOTE_DS_GET_ORDERS_ERROR: $e");
-      return [];
+      log("ORDER_REMOTE_DS_GET_ORDERS_ERROR: $e");
+      return Stream.value([]);
     }
   }
+
 }
+
+
+

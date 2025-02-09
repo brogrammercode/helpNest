@@ -1,8 +1,16 @@
+// ignore_for_file: use_build_context_synchronously, avoid_types_as_parameter_names
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
+import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
+import 'package:helpnest/features/order/data/models/order_model.dart';
+import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
 import 'package:helpnest/features/profile/data/models/feedback_model.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
 import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
@@ -42,22 +50,7 @@ class _ProviderProfileState extends State<ProviderProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.symmetric(vertical: 30.h),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            fixedSize: Size(330.r, 55.r),
-          ),
-          onPressed: () {},
-          child: Text(
-            "Order Service",
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
+      floatingActionButton: _order(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: SingleChildScrollView(
         child: Column(
@@ -79,6 +72,93 @@ class _ProviderProfileState extends State<ProviderProfile> {
             SizedBox(height: 100.h),
           ],
         ),
+      ),
+    );
+  }
+
+  Padding _order(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 30.h),
+      child: BlocConsumer<OrderCubit, OrderState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              fixedSize: Size(330.r, 55.r),
+            ),
+            onPressed: state.addOrderStatus == StateStatus.loading
+                ? () {}
+                : () async {
+                    final td = Timestamp.now();
+                    final UserLocationModel? lastLocation = context
+                            .read<HomeCubit>()
+                            .state
+                            .lastLocation
+                            .isEmpty
+                        ? null
+                        : context.read<HomeCubit>().state.lastLocation.first;
+                    final result = await context.read<OrderCubit>().addOrder(
+                            order: OrderModel(
+                          id: td.millisecondsSinceEpoch.toString(),
+                          consumerID:
+                              FirebaseAuth.instance.currentUser?.uid ?? "",
+                          providerID: widget.provider.user.id,
+                          serviceID: service?.id ?? "",
+                          orderTD: td,
+                          completionTD: td,
+                          consumerLocation: lastLocation ??
+                              UserLocationModel(
+                                  city: "city",
+                                  area: "area",
+                                  pincode: "pincode",
+                                  locality: "locality",
+                                  state: "state",
+                                  country: "country",
+                                  continent: "continent",
+                                  geopoint: const GeoPoint(0, 0),
+                                  updateTD: td),
+                          providerLocation: widget.provider.user.location,
+                          orderFee: 0,
+                          estimatedFee: 0,
+                          trackingPolylinePoints: [],
+                          creationTD: td,
+                          createdBy:
+                              FirebaseAuth.instance.currentUser?.uid ?? "",
+                          deactivate: false,
+                          status: "Order Requested",
+                        ));
+
+                    if (result) {
+                      if (mounted) {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        context
+                            .read<HomeCubit>()
+                            .updateBottomNavIndex(index: 3);
+                      }
+                    }
+                  },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Order Service",
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                if (state.addOrderStatus == StateStatus.loading) ...[
+                  SizedBox(width: 30.w),
+                  SizedBox(
+                    height: 20.h,
+                    width: 20.h,
+                    child: const CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }

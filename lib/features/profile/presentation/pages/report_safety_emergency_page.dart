@@ -169,6 +169,7 @@ class _ReportSafetyEmergencyPageState extends State<ReportSafetyEmergencyPage> {
                         reportedBy:
                             FirebaseAuth.instance.currentUser?.uid ?? "",
                         adminResponse: "",
+                        phoneNumber: "",
                         status: "Emergency Reported",
                       ));
                 }

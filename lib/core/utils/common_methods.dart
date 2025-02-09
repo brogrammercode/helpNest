@@ -265,3 +265,29 @@ double calculateDistance({
   throw ArgumentError(
       '⚠️ Provide either (point1 & point2) or a list of points.');
 }
+
+String mapImage({required List<GeoPoint> points}) {
+  if (points.isEmpty) {
+    throw ArgumentError("Points list cannot be empty");
+  }
+
+  // If only one point, show a single marker
+  if (points.length == 1) {
+    return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/"
+        "pin-l+000000(${points.first.longitude},${points.first.latitude})"
+        "/auto/800x800?padding=120&access_token=pk.eyJ1Ijoic2F1cmFiaC10ZWNoMjYwMyIsImEiOiJjbDk4b2FwemQwcTU4M3BtdjYzNHNkc3d1In0.K3wmWSc7atSi-EqkGtKbwg";
+  }
+
+  // Start (black) and End (green) markers
+  String markers =
+      "pin-l+000000(${points.first.longitude},${points.first.latitude}),"
+      "pin-l+006600(${points.last.longitude},${points.last.latitude})";
+
+  // Generate polyline path
+  String path = points.map((p) => "${p.longitude},${p.latitude}").join(";");
+
+  return "https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/"
+      "$markers,"
+      "path-5+ff0000-0.8($path)"
+      "/auto/800x800?padding=120&access_token=pk.eyJ1Ijoic2F1cmFiaC10ZWNoMjYwMyIsImEiOiJjbDk4b2FwemQwcTU4M3BtdjYzNHNkc3d1In0.K3wmWSc7atSi-EqkGtKbwg";
+}

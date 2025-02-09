@@ -1,6 +1,7 @@
 part of 'home_cubit.dart';
 
 class HomeState extends Equatable {
+  final int bottomNavIndex;
   final List<AdBannerModel> adBanners;
   final Position? position;
   final List<UserLocationModel> lastLocation;
@@ -12,6 +13,7 @@ class HomeState extends Equatable {
   final CommonError error;
 
   const HomeState({
+    this.bottomNavIndex = 0,
     this.adBanners = const [],
     this.position,
     this.lastLocation = const [],
@@ -24,6 +26,7 @@ class HomeState extends Equatable {
   });
 
   HomeState copyWith({
+    int? bottomNavIndex,
     List<AdBannerModel>? adBanners,
     Position? position,
     List<UserLocationModel>? lastLocation,
@@ -35,6 +38,7 @@ class HomeState extends Equatable {
     CommonError? error,
   }) {
     return HomeState(
+      bottomNavIndex: bottomNavIndex ?? this.bottomNavIndex,
       adBanners: adBanners ?? this.adBanners,
       position: position ?? this.position,
       lastLocation: lastLocation ?? this.lastLocation,
@@ -52,6 +56,7 @@ class HomeState extends Equatable {
   @override
   List<Object?> get props =>
       [
+        bottomNavIndex,
         adBanners,
         position,
         lastLocation,

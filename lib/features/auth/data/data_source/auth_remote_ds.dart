@@ -46,6 +46,7 @@ class AuthRemoteDs implements AuthRepo {
           final newUser = UserModel(
             id: user.uid,
             name: user.displayName ?? '',
+            email: user.email ?? "",
             phoneNumber: user.phoneNumber ?? '',
             location: UserLocationModel.fromJson({}),
             image: user.photoURL ?? '',

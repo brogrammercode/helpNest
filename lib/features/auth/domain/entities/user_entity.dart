@@ -4,6 +4,7 @@ import 'package:helpnest/features/auth/data/models/user_model.dart';
 class UserEntity {
   final String id;
   final String name;
+  final String email;
   final String phoneNumber;
   final UserLocationModel location;
   final String image;
@@ -15,6 +16,7 @@ class UserEntity {
   UserEntity(
       {required this.id,
       required this.name,
+      required this.email,
       required this.phoneNumber,
       required this.location,
       required this.image,

@@ -9,6 +9,7 @@ class EmergencyModel extends EmergencyEntity {
     required super.location,
     required super.reportedBy,
     required super.adminResponse,
+    required super.phoneNumber,
     required super.status,
   });
 
@@ -22,6 +23,7 @@ class EmergencyModel extends EmergencyEntity {
       location: UserLocationModel.fromJson(json['location'] ?? {}),
       reportedBy: json['reportedBy'] ?? '',
       adminResponse: json['adminResponse'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
       status: json['status'] ?? "",
     );
   }
@@ -33,13 +35,14 @@ class EmergencyModel extends EmergencyEntity {
       'location': location.toJson(),
       'reportedBy': reportedBy,
       'adminResponse': adminResponse,
+      'phoneNumber': phoneNumber,
       'status': status,
     };
   }
 
   @override
   String toString() {
-    return 'EmergencyModel(id: $id, emergencyTD: $emergencyTD, location: $location, reportedBy: $reportedBy, adminResponse: $adminResponse, status: $status)';
+    return 'EmergencyModel(id: $id, emergencyTD: $emergencyTD, location: $location, reportedBy: $reportedBy, adminResponse: $adminResponse, phoneNumber: $phoneNumber, status: $status)';
   }
 
   EmergencyModel copyWith({
@@ -48,6 +51,7 @@ class EmergencyModel extends EmergencyEntity {
     UserLocationModel? location,
     String? reportedBy,
     String? adminResponse,
+    String? phoneNumber, // phone number of admin which is now active for call
     String? status,
   }) {
     return EmergencyModel(
@@ -56,6 +60,7 @@ class EmergencyModel extends EmergencyEntity {
       location: location ?? this.location,
       reportedBy: reportedBy ?? this.reportedBy,
       adminResponse: adminResponse ?? this.adminResponse,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
       status: status ?? this.status,
     );
   }

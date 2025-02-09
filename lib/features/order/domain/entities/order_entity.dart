@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
-import 'package:helpnest/features/profile/data/models/feedback_model.dart';
 
 class OrderEntity {
   final String id;
   final String consumerID;
   final String providerID;
   final String serviceID;
-  final String orderTD;
-  final String completionTD;
+  final Timestamp orderTD;
+  final Timestamp completionTD;
   final UserLocationModel consumerLocation;
   final UserLocationModel providerLocation;
-  final FeedbackModel feedback;
-  final String orderFee;
-  final String trackingPolylinePoints;
+  final num orderFee;
+  final num estimatedFee;
+  final List trackingPolylinePoints;
   final Timestamp creationTD;
   final String createdBy;
   final bool deactivate;
+  final String status;
 
   OrderEntity(
       {required this.id,
@@ -26,11 +26,13 @@ class OrderEntity {
       required this.orderTD,
       required this.completionTD,
       required this.consumerLocation,
-      required this.providerLocation,
-      required this.feedback,
+    required this.providerLocation,
       required this.orderFee,
+    required this.estimatedFee,
       required this.trackingPolylinePoints,
       required this.creationTD,
       required this.createdBy,
-      required this.deactivate});
+    required this.deactivate,
+    required this.status,
+  });
 }

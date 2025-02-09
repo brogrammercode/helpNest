@@ -7,6 +7,7 @@ class EmergencyEntity {
   final UserLocationModel location;
   final String reportedBy;
   final String adminResponse;
+  final String phoneNumber;
   final String status;
 
   EmergencyEntity({
@@ -15,6 +16,7 @@ class EmergencyEntity {
     required this.location,
     required this.reportedBy,
     required this.adminResponse,
+    required this.phoneNumber,
     required this.status,
   });
 }

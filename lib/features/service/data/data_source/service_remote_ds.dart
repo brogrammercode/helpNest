@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/core/utils/common_methods.dart';
@@ -42,6 +44,8 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
       List<FindServiceProviderParams> result = await Future.wait(
         serviceProviders.map((serviceProvider) async {
           UserModel user = await _getUserForProvider(serviceProvider.id);
+          List<OrderModel> orders =
+              await _getOrdersForProvider(serviceProvider.id);
           List<FeedbackModel> feedbacks =
               await _getFeedbacksForProvider(serviceProvider.id);
 
@@ -59,6 +63,7 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
 
           return FindServiceProviderParams(
             serviceProvider: serviceProvider,
+            orders: orders,
             user: user,
             feedbacks: feedbacks,
             distance: distance,
@@ -76,6 +81,23 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
     } catch (e) {
       throw Exception('❌ Error finding service providers params: $e');
     }
+  }
+
+  /// 🏷️ Fetches orders for a provider
+  Future<List<OrderModel>> _getOrdersForProvider(String providerId) async {
+    QuerySnapshot querySnapshot = await firestore
+        .collection('orders')
+        .where('providerID', isEqualTo: providerId)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      log('❌ No orders found for provider ID: $providerId');
+      return [];
+    }
+
+    return querySnapshot.docs
+        .map((doc) => OrderModel.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
   }
 
   /// 🏷️ Fetches user data for a provider
@@ -103,7 +125,6 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
             (doc) => FeedbackModel.fromJson(doc.data() as Map<String, dynamic>))
         .toList();
   }
-
 
   @override
   Future<List<ServiceModel>> getServices() async {

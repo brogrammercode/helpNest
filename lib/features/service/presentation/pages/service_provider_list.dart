@@ -154,7 +154,7 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
                         color: Theme.of(context).primaryColor),
                   ),
                   Text(
-                    "${provider.distance} Km",
+                    "${provider.distance?.toDouble().toStringAsFixed(2) ?? 0} Km",
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.grey),
                   ),

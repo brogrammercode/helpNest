@@ -7,6 +7,9 @@ import 'package:helpnest/features/home/data/data_source/home_remote_ds.dart';
 import 'package:helpnest/features/home/domain/repo/ad_banner_repo.dart';
 import 'package:helpnest/features/home/domain/repo/home_remote_repo.dart';
 import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
+import 'package:helpnest/features/order/data/data_source/order_remote_ds.dart';
+import 'package:helpnest/features/order/domain/repo/order_repo.dart';
+import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
 import 'package:helpnest/features/profile/data/data_source/profile_remote_ds.dart';
 import 'package:helpnest/features/profile/domain/repo/profile_repo.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
@@ -46,7 +49,12 @@ class Injections {
     _getIt.registerFactory<SearchLocalRepo>(() => SearchLocalDs());
     _getIt.registerFactory<SearchRemoteRepo>(() => SearchRemoteDs());
     _getIt.registerFactory<SearchCubit>(
-        () => SearchCubit(localRepo: _getIt(), remoteRepo: _getIt()));  
+        () => SearchCubit(localRepo: _getIt(), remoteRepo: _getIt()));
+
+    // order
+    _getIt.registerFactory<OrderRepo>(() => OrderRemoteDs());
+    _getIt.registerFactory<OrderCubit>(
+        () => OrderCubit(orderRemoteRepo: _getIt()));
   }
 
   static T get<T extends Object>() {
