@@ -27,7 +27,7 @@ class _HistoryPageState extends State<HistoryPage> {
         final activeOrders = state.orders
             .where((e) => e.order.status != "Order Completed")
             .toList()
-          ..sort((a, b) => a.order.orderTD.compareTo(b.order.orderTD));
+          ..sort((a, b) => b.order.orderTD.compareTo(a.order.orderTD));
 
         final pastOrders = state.orders
             .where((e) => e.order.status == "Order Completed")

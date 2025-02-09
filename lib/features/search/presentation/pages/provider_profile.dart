@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/core/config/error.dart';
+import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
@@ -86,9 +87,15 @@ class _ProviderProfileState extends State<ProviderProfile> {
             style: ElevatedButton.styleFrom(
               fixedSize: Size(330.r, 55.r),
             ),
-            onPressed: state.addOrderStatus == StateStatus.loading
+            onPressed: state.addOrderStatus == StateStatus.loading 
                 ? () {}
                 : () async {
+                    if (widget.provider.user.id ==
+                        FirebaseAuth.instance.currentUser?.uid) {
+                      showSnack(
+                          context: context,
+                          text: "You can't order service from yourself");
+                    } else {
                     final td = Timestamp.now();
                     final UserLocationModel? lastLocation = context
                             .read<HomeCubit>()
@@ -129,12 +136,19 @@ class _ProviderProfileState extends State<ProviderProfile> {
                         ));
 
                     if (result) {
+                        showSnack(
+                            context: context,
+                            icon: Iconsax.tick_circle,
+                            iconColor: Colors.green,
+                            text:
+                                "Order requested to ${widget.provider.user.name} for ${service?.name ?? ""} Service successfully");
                       if (mounted) {
                         Navigator.pop(context);
                         Navigator.pop(context);
                         context
                             .read<HomeCubit>()
                             .updateBottomNavIndex(index: 3);
+                      }
                       }
                     }
                   },

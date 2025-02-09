@@ -291,3 +291,32 @@ String mapImage({required List<GeoPoint> points}) {
       "path-5+ff0000-0.8($path)"
       "/auto/800x800?padding=120&access_token=pk.eyJ1Ijoic2F1cmFiaC10ZWNoMjYwMyIsImEiOiJjbDk4b2FwemQwcTU4M3BtdjYzNHNkc3d1In0.K3wmWSc7atSi-EqkGtKbwg";
 }
+
+
+void showSnack(
+    {required BuildContext context,
+    IconData icon = Iconsax.close_circle5,
+    Color iconColor = Colors.red,
+    required String text}) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.white,
+      content: Row(
+        children: [
+          Icon(
+            icon,
+            size: 20.r,
+            color: iconColor,
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Text(
+              text,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      )));
+}
