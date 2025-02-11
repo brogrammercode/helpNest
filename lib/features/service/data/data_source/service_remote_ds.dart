@@ -9,6 +9,7 @@ import 'package:helpnest/features/profile/data/models/feedback_model.dart';
 import 'package:helpnest/features/profile/data/models/service_provier_model.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
 import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
+import 'package:latlong2/latlong.dart';
 
 class ServiceRemoteDs implements ServiceRemoteRepo {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -53,8 +54,8 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
           if (position != null &&
               user.location.geopoint != const GeoPoint(0, 0)) {
             distance = calculateDistance(
-              point1: (position.latitude, position.longitude),
-              point2: (
+              point1: LatLng(position.latitude, position.longitude),
+              point2: LatLng(
                 user.location.geopoint.latitude,
                 user.location.geopoint.longitude
               ),

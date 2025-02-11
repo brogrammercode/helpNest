@@ -17,7 +17,7 @@ class OrderCubit extends Cubit<OrderState> {
         super(const OrderState()) {
     initOrderSubscription();
   }
-
+ 
   Future<bool> addOrder({required OrderModel order}) async {
     try {
       emit(state.copyWith(addOrderStatus: StateStatus.loading));

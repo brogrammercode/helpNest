@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:helpnest/core/config/color.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<String?> uploadFileAndGetUrl(
@@ -221,11 +224,12 @@ String _getContinentFromCountry(String country) {
 }
 
 
+
 /// 🌍 Calculates distance between points using the Haversine formula.
 double calculateDistance({
-  (double, double)? point1,
-  (double, double)? point2,
-  List<(double, double)>? points,
+  LatLng? point1,
+  LatLng? point2,
+  List<LatLng>? points,
 }) {
   const double R = 6371; // 🌎 Earth radius in km
 
@@ -245,7 +249,8 @@ double calculateDistance({
 
   /// 📍 Distance between two points
   if (point1 != null && point2 != null) {
-    return haversine(point1.$1, point1.$2, point2.$1, point2.$2);
+    return haversine(
+        point1.latitude, point1.longitude, point2.latitude, point2.longitude);
   }
 
   /// 🛣️ Total distance for multiple points
@@ -253,10 +258,10 @@ double calculateDistance({
     double totalDistance = 0.0;
     for (int i = 0; i < points.length - 1; i++) {
       totalDistance += haversine(
-        points[i].$1,
-        points[i].$2,
-        points[i + 1].$1,
-        points[i + 1].$2,
+        points[i].latitude,
+        points[i].longitude,
+        points[i + 1].latitude,
+        points[i + 1].longitude,
       );
     }
     return totalDistance;
@@ -265,6 +270,7 @@ double calculateDistance({
   throw ArgumentError(
       '⚠️ Provide either (point1 & point2) or a list of points.');
 }
+
 
 String mapImage({required List<GeoPoint> points}) {
   if (points.isEmpty) {
@@ -319,4 +325,40 @@ void showSnack(
           ),
         ],
       )));
+}
+
+Future<List<LatLng>> fetchRoute({
+  required LatLng consumerLatLng,
+  required LatLng providerLatLng,
+  String? lastFetchedRoute,
+}) async {
+  final String osrmUrl =
+      "https://router.project-osrm.org/route/v1/driving/${providerLatLng.longitude},${providerLatLng.latitude};${consumerLatLng.longitude},${consumerLatLng.latitude}?overview=full&geometries=geojson";
+
+  try {
+    final response = await http.get(Uri.parse(osrmUrl));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final newRoute =
+          json.encode(data["routes"][0]["geometry"]["coordinates"]);
+
+      if (newRoute == lastFetchedRoute) {
+        return [];
+      }
+
+      final List<dynamic> coordinates =
+          data["routes"][0]["geometry"]["coordinates"];
+      return coordinates
+          .map<LatLng>(
+              (coord) => LatLng(coord[1] as double, coord[0] as double))
+          .toList();
+    } else {
+      debugPrint("Failed to fetch route: ${response.statusCode}");
+      return [];
+    }
+  } catch (e) {
+    debugPrint("Error fetching route: $e");
+    return [];
+  }
 }

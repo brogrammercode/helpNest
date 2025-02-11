@@ -11,7 +11,7 @@ class OrderState extends Equatable {
     this.addOrderStatus = StateStatus.initial,
     this.streamOrderStatus = StateStatus.initial,
     this.error = const CommonError(),
-  });
+  }); 
 
   OrderState copyWith({
     List<GetOrderParam>? orders,
