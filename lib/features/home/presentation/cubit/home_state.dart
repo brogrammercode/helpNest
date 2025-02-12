@@ -2,6 +2,7 @@ part of 'home_cubit.dart';
 
 class HomeState extends Equatable {
   final int bottomNavIndex;
+  final bool providerMode;
   final List<AdBannerModel> adBanners;
   final Position? position;
   final List<UserLocationModel> lastLocation;
@@ -10,10 +11,13 @@ class HomeState extends Equatable {
   final StateStatus getLocationStatus;
   final StateStatus getLocationFromDatabaseStatus;
   final StateStatus updateLocationToDatabaseStatus;
+  final StateStatus detectActiveOrderStatus;
+  final StateStatus updatePointsToActiveOrderStatus;
   final CommonError error;
 
   const HomeState({
     this.bottomNavIndex = 0,
+    this.providerMode = false,
     this.adBanners = const [],
     this.position,
     this.lastLocation = const [],
@@ -22,11 +26,14 @@ class HomeState extends Equatable {
     this.getLocationStatus = StateStatus.initial,
     this.getLocationFromDatabaseStatus = StateStatus.initial,
     this.updateLocationToDatabaseStatus = StateStatus.initial,
+    this.detectActiveOrderStatus = StateStatus.initial,
+    this.updatePointsToActiveOrderStatus = StateStatus.initial,
     this.error = const CommonError(),
   });
 
   HomeState copyWith({
     int? bottomNavIndex,
+    bool? providerMode,
     List<AdBannerModel>? adBanners,
     Position? position,
     List<UserLocationModel>? lastLocation,
@@ -35,10 +42,13 @@ class HomeState extends Equatable {
     StateStatus? getLocationStatus,
     StateStatus? getLocationFromDatabaseStatus,
     StateStatus? updateLocationToDatabaseStatus,
+    StateStatus? detectActiveOrderStatus,
+    StateStatus? updatePointsToActiveOrderStatus,
     CommonError? error,
   }) {
     return HomeState(
       bottomNavIndex: bottomNavIndex ?? this.bottomNavIndex,
+      providerMode: providerMode ?? this.providerMode,
       adBanners: adBanners ?? this.adBanners,
       position: position ?? this.position,
       lastLocation: lastLocation ?? this.lastLocation,
@@ -49,14 +59,18 @@ class HomeState extends Equatable {
           getLocationFromDatabaseStatus ?? this.getLocationFromDatabaseStatus,
       updateLocationToDatabaseStatus:
           updateLocationToDatabaseStatus ?? this.updateLocationToDatabaseStatus,
+      detectActiveOrderStatus:
+          detectActiveOrderStatus ?? this.detectActiveOrderStatus,
+      updatePointsToActiveOrderStatus: updatePointsToActiveOrderStatus ??
+          this.updatePointsToActiveOrderStatus,
       error: error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [
+  List<Object?> get props => [
         bottomNavIndex,
+        providerMode,
         adBanners,
         position,
         lastLocation,
@@ -65,6 +79,8 @@ class HomeState extends Equatable {
         getLocationStatus,
         getLocationFromDatabaseStatus,
         updateLocationToDatabaseStatus,
+        detectActiveOrderStatus,
+        updatePointsToActiveOrderStatus,
         error
       ];
 }

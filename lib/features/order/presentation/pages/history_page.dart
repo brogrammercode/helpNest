@@ -1,11 +1,12 @@
 import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
 import 'package:helpnest/features/order/presentation/pages/track_page.dart';
+import 'package:helpnest/features/order/presentation/widgets/history_widgets.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,8 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  bool providerOrders = false;
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<OrderCubit, OrderState>(
@@ -25,12 +28,26 @@ class _HistoryPageState extends State<HistoryPage> {
       builder: (context, state) {
         log("ORDER_COUNT: ${state.orders.length}");
         final activeOrders = state.orders
-            .where((e) => e.order.status != "Order Completed")
+            .where((e) =>
+                (e.order.status != "Order Completed" &&
+                    e.order.status != "Order Cancelled") &&
+                (providerOrders
+                    ? e.order.providerID ==
+                        FirebaseAuth.instance.currentUser?.uid
+                    : e.order.consumerID ==
+                        FirebaseAuth.instance.currentUser?.uid))
             .toList()
           ..sort((a, b) => b.order.orderTD.compareTo(a.order.orderTD));
 
         final pastOrders = state.orders
-            .where((e) => e.order.status == "Order Completed")
+            .where((e) =>
+                (e.order.status == "Order Completed" ||
+                    e.order.status == "Order Cancelled") &&
+                (providerOrders
+                    ? e.order.providerID ==
+                        FirebaseAuth.instance.currentUser?.uid
+                    : e.order.consumerID ==
+                        FirebaseAuth.instance.currentUser?.uid))
             .toList()
           ..sort((a, b) => b.order.orderTD.compareTo(a.order.orderTD));
 
@@ -57,23 +74,53 @@ class _HistoryPageState extends State<HistoryPage> {
                             .first;
                         final location = order.order.consumerLocation;
                         return OrderCard(
-                          name: order.user.name,
-                          role: service.name,
+                          name: providerOrders
+                              ? order.consumer.name
+                              : order.user.name,
+                          role: providerOrders ? "Consumer" : service.name,
                           location:
                               "${location.area}, ${location.city}, ${location.state}, ${location.country} Pin - ${location.pincode}",
                           date: DateFormat("dd MMM, yyyy")
                               .format(order.order.orderTD.toDate()),
-                          fee: "₹ 500",
-                          imageUrl:
-                             order.user.image,
-                          buttonText: "Track Order",
-                          onButtonPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        TrackPage(orderID: order.order.id)));
-                          },
+                          fee:
+                              "₹ ${order.order.orderFee != 0 ? order.order.orderFee : order.order.estimatedFee != 0 ? order.order.estimatedFee : "N/A"}",
+                          imageUrl: providerOrders
+                              ? order.consumer.image
+                              : order.user.image,
+                          buttonText: order.order.status == "Order Requested"
+                              ? "Order Requested"
+                              : order.order.status == "Estimated Fee Submitted"
+                                  ? "Order at ₹ ${order.order.estimatedFee}"
+                                  : order.order.status == "Order Placed"
+                                      ? "Track Order"
+                                      : "Track Order",
+                          buttonIcon: order.order.status == "Order Requested"
+                              ? Iconsax.cloud_add
+                              : order.order.status == "Order Placed"
+                                  ? Iconsax.gps
+                                  : null,
+                          onButtonPressed:
+                              (order.order.status != "Order Placed" &&
+                                      order.order.status != "On the Way")
+                                  ? () {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          backgroundColor: Colors.transparent,
+                                          barrierColor: Colors.transparent,
+                                          isDismissible: false,
+                                          isScrollControlled: true,
+                                          builder: (_) => OrderBottomSheet(
+                                                context: context,
+                                                orderID: order.order.id,
+                                              ));
+                                    }
+                                  : () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => TrackPage(
+                                                  orderID: order.order.id)));
+                                    },
                         );
                       }),
                   if (pastOrders.isNotEmpty) ...[
@@ -90,7 +137,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: pastOrders.length,
                         itemBuilder: (context, i) {
-                          final order = activeOrders[i];
+                          final order = pastOrders[i];
                           final service = context
                               .read<ServiceCubit>()
                               .state
@@ -100,17 +147,19 @@ class _HistoryPageState extends State<HistoryPage> {
                               .first;
                           final location = order.order.consumerLocation;
                           return OrderCard(
-                            name: order.user.name,
-                            role: service.name,
+                            name: providerOrders
+                                ? order.consumer.name
+                                : order.user.name,
+                            role: providerOrders ? "Consumer" : service.name,
                             location:
                                 "${location.area}, ${location.city}, ${location.state}, ${location.country} Pin - ${location.pincode}",
                             date: DateFormat("dd MMM, yyyy")
                                 .format(order.order.orderTD.toDate()),
-                            fee: "₹ 500",
-                            imageUrl: order.user.image,
-                            onButtonPressed: () {
-                              // Add tracking navigation logic
-                            },
+                            fee:
+                                "₹ ${order.order.orderFee != 0 ? order.order.orderFee : order.order.estimatedFee != 0 ? order.order.estimatedFee : "N/A"}",
+                            imageUrl: providerOrders
+                                ? order.consumer.image
+                                : order.user.image,
                           );
                         }),
                   ],
@@ -130,7 +179,7 @@ class _HistoryPageState extends State<HistoryPage> {
         padding: EdgeInsets.only(right: 15.w),
         child: AppBar(
           title: Text(
-            "Order History",
+            providerOrders ? "Assigned Orders" : "Order History",
             style: Theme.of(context)
                 .textTheme
                 .bodyLarge!
@@ -138,141 +187,13 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
           actions: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Iconsax.notification),
-              tooltip: "Notifications",
+              onPressed: () => setState(() => providerOrders = !providerOrders),
+              icon: const Icon(Iconsax.arrow_2),
+              tooltip: "Switch Orders",
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class OrderCard extends StatelessWidget {
-  final String name;
-  final String role;
-  final String location;
-  final String date;
-  final String fee;
-  final String imageUrl;
-  final String? buttonText;
-  final VoidCallback? onButtonPressed;
-  final VoidCallback? onCardTapped;
-
-  const OrderCard({
-    required this.name,
-    required this.role,
-    required this.location,
-    required this.date,
-    required this.fee,
-    required this.imageUrl,
-    this.buttonText,
-    this.onButtonPressed,
-    this.onCardTapped,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onCardTapped,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        margin: EdgeInsets.only(bottom: 20.h),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withOpacity(0.3)),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        padding: EdgeInsets.all(15.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                ClipOval(
-                  child: CachedNetworkImage(
-                    height: 50.h,
-                    width: 50.h,
-                    fit: BoxFit.cover,
-                    imageUrl: imageUrl,
-                    placeholder: (_, __) => const CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
-                    errorWidget: (_, __, ___) =>
-                        const Icon(Icons.error, color: Colors.red),
-                  ),
-                ),
-                SizedBox(width: 10.w),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(role),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 20.h),
-            Text(
-              "Order Location",
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            SizedBox(height: 5.h),
-            Text(location, style: Theme.of(context).textTheme.bodyMedium),
-            SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildInfoColumn("Order Time", date, context),
-                _buildInfoColumn("Order Fee", fee, context),
-              ],
-            ),
-            if (buttonText != null && onButtonPressed != null) ...[
-              SizedBox(height: 20.h),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  fixedSize: Size(330.r, 55.r),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r))
-                ),
-                onPressed: onButtonPressed,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Iconsax.location, size: 20.sp),
-                    SizedBox(width: 20.w),
-                    Text(
-                      buttonText!,
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Column _buildInfoColumn(String title, String value, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        SizedBox(height: 5.h),
-        Text(value),
-      ],
     );
   }
 }

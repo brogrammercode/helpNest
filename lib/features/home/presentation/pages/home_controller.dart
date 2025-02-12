@@ -12,6 +12,7 @@ import 'package:helpnest/features/search/presentation/pages/search_page.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:helpnest/features/service/presentation/pages/service_main_page.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:badges/badges.dart' as badge;
 
 class HomeController extends StatefulWidget {
   const HomeController({super.key});
@@ -21,8 +22,6 @@ class HomeController extends StatefulWidget {
 }
 
 class _HomeControllerState extends State<HomeController> {
-  // int _bottomNavIndex = 0;
-
   @override
   void initState() {
     _init();
@@ -80,12 +79,20 @@ class _HomeControllerState extends State<HomeController> {
             index: 2,
             currentIndex: currentIndex,
           ),
-          _buildBottomNavButton(
-            context,
-            icon: Iconsax.receipt,
-            index: 3,
-            currentIndex: currentIndex,
-          ),
+          BlocConsumer<OrderCubit, OrderState>(
+              listener: (context, state) {},
+              builder: (context, state) {
+                return _buildBottomNavButton(
+                  context,
+                  icon: Iconsax.receipt,
+                  index: 3,
+                  currentIndex: currentIndex,
+                  badgeValue: state.orders
+                      .where((e) => e.order.status != "Completed")
+                      .toList()
+                      .length,
+                );
+              }),
           _buildBottomNavButton(
             context,
             icon: Iconsax.frame_1,
@@ -103,14 +110,26 @@ class _HomeControllerState extends State<HomeController> {
     required IconData icon,
     required int index,
     required int currentIndex,
+    int badgeValue = 0,
   }) {
     final bool isSelected = currentIndex == index;
     return IconButton(
       onPressed: () =>
           context.read<HomeCubit>().updateBottomNavIndex(index: index),
-      icon: Icon(
-        icon,
-        color: isSelected ? Colors.white : Theme.of(context).iconTheme.color,
+      icon: badge.Badge(
+        showBadge: badgeValue != 0,
+        badgeStyle: badge.BadgeStyle(padding: EdgeInsets.all(5.r)),
+        badgeContent: Text(
+          badgeValue.toString(),
+          style: Theme.of(context)
+              .textTheme
+              .labelSmall!
+              .copyWith(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        child: Icon(
+          icon,
+          color: isSelected ? Colors.white : Theme.of(context).iconTheme.color,
+        ),
       ),
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),

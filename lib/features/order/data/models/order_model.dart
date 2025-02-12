@@ -18,7 +18,7 @@ class OrderModel extends OrderEntity {
     required super.creationTD,
     required super.createdBy,
     required super.deactivate,
-    required super.status,
+    required super.status, // 1. Order Requested, 2. Estimated Fee Submitted, 3. Order Placed, 4. On the Way, 5. Order Completed, 6. Order Cancelled
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {

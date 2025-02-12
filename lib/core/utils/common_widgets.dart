@@ -44,6 +44,7 @@ class CustomTextFormField extends StatelessWidget {
         absorbing: !isEnabled,
         child: TextFormField(
           controller: controller,
+
           maxLines: maxLines,
           minLines: minLines,
           enabled: isEnabled && onTap == null,

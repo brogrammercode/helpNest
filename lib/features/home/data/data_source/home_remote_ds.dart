@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
@@ -29,5 +31,31 @@ class HomeRemoteDs implements HomeRemoteRepo {
       {"location": location.toJson()},
       SetOptions(merge: true),
     );
+  }
+
+  @override
+  Stream<String> getOrderIdToUpdatePoints() {
+    return _firestore
+        .collection("orders")
+        .where("providerID",
+            isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
+        .where("status", isEqualTo: "On the Way")
+        .limit(1)
+        .snapshots()
+        .map((querySnapshot) =>
+            querySnapshot.docs.isNotEmpty ? querySnapshot.docs.first.id : "")
+        .handleError((error) => "");
+  }
+
+  @override
+  Future<void> updatePoints(
+      {required String orderID, required GeoPoint point}) async {
+    try {
+      await _firestore.collection("orders").doc(orderID).update({
+        "trackingPolylinePoints": FieldValue.arrayUnion([point])
+      });
+    } catch (e) {
+      log("Error updating tracking points: \$e");
+    }
   }
 }

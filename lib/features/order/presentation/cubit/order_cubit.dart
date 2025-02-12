@@ -32,6 +32,20 @@ class OrderCubit extends Cubit<OrderState> {
     }
   }
 
+  Future<bool> updateOrder({required OrderModel order}) async {
+    try {
+      emit(state.copyWith(updateOrderStatus: StateStatus.loading));
+      await _orderRemoteRepo.updateOrder(order: order);
+      emit(state.copyWith(updateOrderStatus: StateStatus.success));
+      return true;
+    } catch (e) {
+      emit(state.copyWith(
+          updateOrderStatus: StateStatus.failure,
+          error: CommonError(consoleMessage: e.toString())));
+      return false;
+    }
+  }
+
   Future<void> initOrderSubscription() async {
     try {
       emit(state.copyWith(streamOrderStatus: StateStatus.loading));

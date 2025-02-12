@@ -11,7 +11,6 @@ import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/home/data/models/ad_banner_model.dart';
 import 'package:helpnest/features/home/domain/repo/ad_banner_repo.dart';
 import 'package:helpnest/features/home/domain/repo/home_remote_repo.dart';
-import 'package:intl/intl.dart';
 
 part 'home_state.dart';
 
@@ -19,6 +18,7 @@ class HomeCubit extends Cubit<HomeState> {
   final AdBannerRepo _adBannerRepo;
   final HomeRemoteRepo _homeRemoteRepo;
   StreamSubscription? _isLocationEnabledSubscription;
+  StreamSubscription? _detectingOrderWithActiveSubscription;
 
   HomeCubit(
       {required AdBannerRepo adBannerRepo,
@@ -27,10 +27,15 @@ class HomeCubit extends Cubit<HomeState> {
         _homeRemoteRepo = homeRemoteRepo,
         super(const HomeState()) {
     initializeIsLocationEnabledListener();
+    detectingOrderWithActiveListener();
   }
 
   Future<void> updatePosition({required Position position}) async {
     emit(state.copyWith(position: position));
+  }
+
+  Future<void> updateProviderMode({required bool providerMode}) async {
+    emit(state.copyWith(providerMode: providerMode));
   }
 
   Future<void> updateBottomNavIndex({required int index}) async {
@@ -75,28 +80,46 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  Future<void> _startLocationLogging() async {
-    await _getLocation();
+  Future<void> _startLocationLogging(
+      {String orderIdWithActiveOrderForProvider = ""}) async {
+    await _getLocation(activeOrder: orderIdWithActiveOrderForProvider);
     _locationTimer?.cancel();
-    _locationTimer = Timer.periodic(const Duration(minutes: 5), (timer) async {
-      await _getLocation();
-      
+    _locationTimer = Timer.periodic(
+        orderIdWithActiveOrderForProvider.isNotEmpty
+            ? const Duration(minutes: 1)
+            : const Duration(minutes: 5), (timer) async {
+      await _getLocation(activeOrder: orderIdWithActiveOrderForProvider);
     });
   }
 
-  Future<void> _getLocation() async {
+  Future<void> _getLocation({String activeOrder = ""}) async {
     try {
       emit(state.copyWith(getLocationStatus: StateStatus.loading));
       final position = await Geolocator.getCurrentPosition();
+
+      if (state.lastLocation.isNotEmpty) {
+        final lastLocation = state.lastLocation.first.geopoint;
+        if ((position.latitude - lastLocation.latitude).abs() < 0.0001 &&
+            (position.longitude - lastLocation.longitude).abs() < 0.0001) {
+          log("Location unchanged, skipping update.");
+          return;
+        }
+      }
+
       updatePosition(position: position);
       final lastLocation = await getUserLocationFromPosition(position);
       emit(state.copyWith(
           lastLocation: [lastLocation],
           getLocationStatus: StateStatus.success));
+
       await updateLocationToDatabase(location: lastLocation);
-      if (state.lastLocation.isNotEmpty) {
-        log("${state.lastLocation} at ---${state.lastLocation.first.geopoint.latitude}, ${state.lastLocation.first.geopoint.longitude}--- updated on ${DateFormat().format(state.lastLocation.first.updateTD.toDate())}");
+
+      if (activeOrder.isNotEmpty) {
+        await _homeRemoteRepo.updatePoints(
+            orderID: activeOrder, point: lastLocation.geopoint);
       }
+
+      log("Location updated: ${lastLocation.geopoint.latitude}, ${lastLocation.geopoint.longitude}");
     } catch (e) {
       log("GET_LOCATION_STATUS_ERROR: $e");
       emit(state.copyWith(getLocationStatus: StateStatus.failure));
@@ -147,12 +170,34 @@ class HomeCubit extends Cubit<HomeState> {
           getLocationFromDatabaseStatus: StateStatus.failure,
           error: CommonError(consoleMessage: e.toString())));
     }
-  } 
+  }
+
+  void detectingOrderWithActiveListener() async {
+    emit(state.copyWith(detectActiveOrderStatus: StateStatus.loading));
+    try {
+      _detectingOrderWithActiveSubscription =
+          _homeRemoteRepo.getOrderIdToUpdatePoints().listen((orderID) {
+        if (orderID.isNotEmpty) {
+          _startLocationLogging(orderIdWithActiveOrderForProvider: orderID);
+        } else {
+          _locationTimer?.cancel();
+          // _startLocatioLogging(); // might add this without any params because normal update is stopping after stopping order update
+        }
+      });
+      emit(state.copyWith(detectActiveOrderStatus: StateStatus.success));
+    } catch (e) {
+      log("STREAM_ORDER_ERROR: $e");
+      emit(state.copyWith(
+          detectActiveOrderStatus: StateStatus.failure,
+          error: CommonError(consoleMessage: e.toString())));
+    }
+  }
 
   @override
   Future<void> close() {
     _isLocationEnabledSubscription?.cancel();
     _locationTimer?.cancel();
+    _detectingOrderWithActiveSubscription?.cancel();
     return super.close();
   }
 }

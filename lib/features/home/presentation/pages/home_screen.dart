@@ -53,10 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
         listener: (context, state) {},
         builder: (context, state) {
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.w),
+            padding: EdgeInsets.symmetric(horizontal: 5.w),
             child: AppBar(
               automaticallyImplyLeading: false,
-              leading: _buildIconButton(icon: Iconsax.menu_1, onPressed: () {}),
+              // leading: _buildIconButton(icon: Iconsax.menu_1, onPressed: () {}),
               title: Text(
                 "helpNest",
                 style: Theme.of(context)
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Theme.of(context).primaryColor),
                           )
                         : null),
-                _buildIconButton(icon: Iconsax.notification, onPressed: () {}),
+                // _buildIconButton(icon: Iconsax.notification, onPressed: () {}),
               ],
             ),
           );

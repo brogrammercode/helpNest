@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/core/utils/common_methods.dart';
+import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
@@ -30,11 +31,12 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
         } else if (state.logOutStatus == StateStatus.success) {
           Navigator.pushReplacementNamed(context, AppRoutes.onboardingPage);
         }
-        if (state.getUserStatus == StateStatus.success) {
-         
-        }
+        if (state.getUserStatus == StateStatus.success) {}
       },
       builder: (context, state) {
+        context
+            .read<HomeCubit>()
+            .updateProviderMode(providerMode: state.provider.isNotEmpty);
         return Scaffold(
           appBar: _buildAppBar(context),
           body: SingleChildScrollView(
@@ -135,14 +137,14 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                 .bodyLarge!
                 .copyWith(fontWeight: FontWeight.bold),
           ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Iconsax.menu_1),
-              style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(
-                      side: BorderSide(color: Colors.grey.withOpacity(.3)))),
-            ),
+          actions: const [
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(Iconsax.menu_1),
+            //   style: ElevatedButton.styleFrom(
+            //       shape: CircleBorder(
+            //           side: BorderSide(color: Colors.grey.withOpacity(.3)))),
+            // ),
           ],
         ),
       ),
@@ -161,16 +163,14 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
               alignment: Alignment.centerLeft,
               child: _buildCircularImage(
                 padded: true,
-                imageUrl: 
-                serviceLogo ??
+                imageUrl: serviceLogo ??
                     "https://cdn.dribbble.com/userupload/16281153/file/original-b6ff14bfc931d716c801ea7e250965ce.png?resize=1600x1200&vertical=center",
               ),
             ),
             Align(
               alignment: Alignment.centerRight,
               child: _buildCircularImage(
-                imageUrl: 
-                providerImage ??
+                imageUrl: providerImage ??
                     "https://cdn.dribbble.com/userupload/16366138/file/original-c35bbf68ba08abeb0509f09de77dd62b.jpg?resize=1600x1200&vertical=center",
               ),
             ),
@@ -231,8 +231,8 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             child: Center(
               child: _buildCircularImage(
                   imageUrl: state.user.isNotEmpty
-                  ? state.user.first.image
-                  : "helpNest User"),
+                      ? state.user.first.image
+                      : "helpNest User"),
             ),
           ),
         ],

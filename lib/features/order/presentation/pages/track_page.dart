@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
-import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
@@ -65,7 +65,6 @@ class _TrackPageState extends State<TrackPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<OrderCubit, OrderState>(
@@ -100,9 +99,9 @@ class _TrackPageState extends State<TrackPage> {
             .state
             .services
             .firstWhere((service) => service.id == order.serviceID);
-        final me = context.read<ProfileCubit>().state.user.first;
+        final me = orderData.consumer;
         log("LOADING");
-        
+
         return Scaffold(
           floatingActionButton: _bottomBar(
               context: context,
@@ -121,7 +120,10 @@ class _TrackPageState extends State<TrackPage> {
                   left: 0,
                   right: 0,
                   child: _appBar(
-                      context: context, provider: provider, service: service))
+                      context: context,
+                      provider: provider,
+                      service: service,
+                      consumer: me))
             ],
           ),
         );
@@ -129,7 +131,6 @@ class _TrackPageState extends State<TrackPage> {
     );
   }
 
- 
   FlutterMap _map(OrderModel order, UserModel provider, UserModel me) {
     final LatLng consumerLatLng = LatLng(
         order.consumerLocation.geopoint.latitude,
@@ -157,7 +158,6 @@ class _TrackPageState extends State<TrackPage> {
           //     "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
           userAgentPackageName: "com.example.helpnest",
         ),
-        
         PolylineLayer(
           polylines: [
             Polyline(
@@ -180,7 +180,8 @@ class _TrackPageState extends State<TrackPage> {
   _appBar(
       {required BuildContext context,
       required UserModel provider,
-      required ServiceModel service}) {
+      required ServiceModel service,
+      required UserModel consumer}) {
     return SafeArea(
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
@@ -211,18 +212,27 @@ class _TrackPageState extends State<TrackPage> {
                   child: Row(
                     children: [
                       _buildProfileImages(
-                          providerImage: provider.image,
+                          providerImage: provider.id ==
+                                  FirebaseAuth.instance.currentUser?.uid
+                              ? consumer.image
+                              : provider.image,
                           serviceImage: service.logo),
                       SizedBox(width: 15.w),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            provider.name,
+                            provider.id ==
+                                    FirebaseAuth.instance.currentUser?.uid
+                                ? consumer.name
+                                : provider.name,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "${service.name} Service",
+                            provider.id ==
+                                    FirebaseAuth.instance.currentUser?.uid
+                                ? "Consumer"
+                                : "${service.name} Service",
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
