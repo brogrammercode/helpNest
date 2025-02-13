@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpnest/core/config/error.dart';
-import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/search/domain/repo/search_local_repo.dart';
 import 'package:helpnest/features/search/domain/repo/search_remote_repo.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
+import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 
 part 'search_state.dart';
 
@@ -19,10 +19,12 @@ class SearchCubit extends Cubit<SearchState> {
         _localRepo = localRepo,
         super(const SearchState());
 
-  Future<void> getSearchResult({required String input}) async {
+  Future<void> getSearchResult(
+      {required String input, required List<ServiceModel> services}) async {
     try {
       emit(state.copyWith(getSearchResultStatus: StateStatus.loading));
-      final result = await _remoteRepo.getSearchResult(input: input);
+      final result =
+          await _remoteRepo.getSearchResult(input: input, services: services);
       emit(state.copyWith(
         services: result.services,
         providers: result.providers,

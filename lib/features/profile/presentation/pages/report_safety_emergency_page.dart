@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:helpnest/core/config/color.dart';
 import 'package:helpnest/core/config/error.dart';
+import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/profile/data/models/emergency_model.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
@@ -245,7 +246,8 @@ class _ReportSafetyEmergencyPageState extends State<ReportSafetyEmergencyPage> {
           ),
           SizedBox(height: 20.h),
           ElevatedButton(
-              onPressed: () {},
+              onPressed: () async =>
+                  call(context: context, phoneNumber: emergency.phoneNumber),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),

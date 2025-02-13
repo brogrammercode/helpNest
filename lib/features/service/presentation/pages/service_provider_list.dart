@@ -2,10 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/core/config/color.dart';
 import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/features/service/data/models/service_model.dart';
 import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
+import 'package:badges/badges.dart' as badge;
+import 'package:iconsax/iconsax.dart';
 
 class ServiceProviderList extends StatefulWidget {
   const ServiceProviderList({super.key});
@@ -57,7 +60,8 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
                   ),
                 ),
                 SizedBox(height: 20.h),
-                _buildSection(
+                if (providers.length > 20) ...[
+                  _buildSection(
                   title: "Top Plumbers",
                   itemCount: providers.length,
                   itemBuilder: (context, index) => _buildPersonTile(
@@ -66,6 +70,7 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
                     service: service,
                   ),
                 ),
+                ],
               ],
             ),
           ),
@@ -110,11 +115,17 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
       required FindServiceProviderParams provider,
       required ServiceModel service}) {
     num avgRating = 5.0;
+    num avgFee = 0;
     if (provider.feedbacks.isNotEmpty) {
       double totalRating =
           provider.feedbacks.fold(0, (sum, feedback) => sum + feedback.rating);
       avgRating = totalRating / provider.feedbacks.length;
     } 
+    if (provider.orders.isNotEmpty) {
+      double totalFee =
+          provider.orders.fold(0, (sum, order) => sum + order.orderFee);
+      avgFee = totalFee / provider.orders.length;
+    }
     return InkWell(
       onTap: () {
         Navigator.pushNamed(
@@ -148,7 +159,7 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    "\u20b9 500",
+                    "\u20b9 ${avgFee == 0 ? "N/A" : avgFee}",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor),
@@ -179,12 +190,20 @@ class _ServiceProviderListState extends State<ServiceProviderList> {
   }
 
   Widget _buildProfileImage(String imageUrl) {
-    return ClipOval(
-      child: CachedNetworkImage(
-        height: 50.h,
-        width: 50.h,
-        fit: BoxFit.cover,
-        imageUrl: imageUrl,
+    return badge.Badge(
+      showBadge: true,
+      badgeContent:
+          Icon(Iconsax.shield_tick5, color: AppColors.green500, size: 20.r),
+      badgeStyle: badge.BadgeStyle(
+          badgeColor: Colors.white, padding: EdgeInsets.all(.0.w)),
+      position: badge.BadgePosition.bottomEnd(bottom: 1.h, end: -5),
+      child: ClipOval(
+        child: CachedNetworkImage(
+          height: 50.h,
+          width: 50.h,
+          fit: BoxFit.cover,
+          imageUrl: imageUrl,
+        ),
       ),
     );
   }

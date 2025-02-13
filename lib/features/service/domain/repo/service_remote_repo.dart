@@ -27,4 +27,21 @@ class FindServiceProviderParams {
     required this.feedbacks,
     this.distance,
   });
+
+  FindServiceProviderParams copyWith({
+    ServiceProviderModel? serviceProvider,
+    UserModel? user,
+    List<OrderModel>? orders,
+    List<FeedbackModel>? feedbacks,
+    double? distance,
+  }) {
+    return FindServiceProviderParams(
+      serviceProvider: serviceProvider ?? this.serviceProvider,
+      user: user ?? this.user,
+      orders: orders ?? List.from(this.orders),
+      feedbacks: feedbacks ?? List.from(this.feedbacks),
+      distance: distance ?? this.distance,
+    );
+  }
 }
+

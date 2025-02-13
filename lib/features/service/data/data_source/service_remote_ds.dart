@@ -33,6 +33,7 @@ class ServiceRemoteDs implements ServiceRemoteRepo {
       QuerySnapshot serviceProvidersSnapshot = await firestore
           .collection('service_providers')
           .where('serviceID', isEqualTo: serviceID)
+          .where("status", isEqualTo: "verified")
           .get();
 
       List<ServiceProviderModel> serviceProviders = serviceProvidersSnapshot

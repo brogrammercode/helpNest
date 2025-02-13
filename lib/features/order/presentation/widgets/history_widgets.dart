@@ -8,8 +8,9 @@ import 'package:helpnest/core/config/color.dart';
 import 'package:helpnest/core/utils/common_widgets.dart';
 import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:badges/badges.dart' as badge;
 
-class OrderBottomSheet extends StatelessWidget {
+class OrderBottomSheet extends StatefulWidget {
   const OrderBottomSheet(
       {super.key, required this.context, required this.orderID});
 
@@ -17,11 +18,20 @@ class OrderBottomSheet extends StatelessWidget {
   final String orderID;
 
   @override
+  State<OrderBottomSheet> createState() => _OrderBottomSheetState();
+}
+
+class _OrderBottomSheetState extends State<OrderBottomSheet> {
+  // ignore: prefer_final_fields
+  TextEditingController _estimatedFee = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
     return BlocConsumer<OrderCubit, OrderState>(
       listener: (context, state) {},
       builder: (context, state) {
-        final order = state.orders.firstWhere((e) => e.order.id == orderID);
+        final order =
+            state.orders.firstWhere((e) => e.order.id == widget.orderID);
         final isProvider =
             order.order.providerID == FirebaseAuth.instance.currentUser?.uid;
         return Container(
@@ -87,7 +97,7 @@ class OrderBottomSheet extends StatelessWidget {
                   padding: EdgeInsets.only(top: 20.h, bottom: 10.h),
                   child: CustomTextFormField(
                     labelText: "Estimated Fee",
-                    controller: TextEditingController(),
+                    controller: _estimatedFee,
                     keyboardType: TextInputType.number,
                     underlineBorderedTextField: false,
                   ),
@@ -96,7 +106,10 @@ class OrderBottomSheet extends StatelessWidget {
                   width: double.infinity,
                   padding: EdgeInsets.only(top: 0.h),
                   child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => context.read<OrderCubit>().updateOrder(
+                          order: order.order.copyWith(
+                              estimatedFee: num.tryParse(_estimatedFee.text),
+                              status: "Estimated Fee Submitted")),
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.r))),
@@ -113,7 +126,11 @@ class OrderBottomSheet extends StatelessWidget {
                   children: [
                     Expanded(
                         child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () => context
+                                .read<OrderCubit>()
+                                .updateOrder(
+                                    order: order.order
+                                        .copyWith(status: "Order Cancelled")),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.red600,
                                 shape: RoundedRectangleBorder(
@@ -130,7 +147,13 @@ class OrderBottomSheet extends StatelessWidget {
                     SizedBox(width: 20.w),
                     Expanded(
                         child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () => context
+                                .read<OrderCubit>()
+                                .updateOrder(
+                                    order: order.order
+                                        .copyWith(status: "Order Placed"))
+                                // ignore: use_build_context_synchronously
+                                .whenComplete(() => Navigator.pop(context)),
                             style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.r))),
@@ -187,6 +210,7 @@ class OrderCard extends StatelessWidget {
   final IconData? buttonIcon;
   final VoidCallback? onButtonPressed;
   final VoidCallback? onCardTapped;
+  final bool showBadge;
 
   const OrderCard({
     required this.name,
@@ -199,6 +223,7 @@ class OrderCard extends StatelessWidget {
     this.buttonIcon,
     this.onButtonPressed,
     this.onCardTapped,
+    this.showBadge = false,
     super.key,
   });
 
@@ -219,17 +244,25 @@ class OrderCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                ClipOval(
-                  child: CachedNetworkImage(
-                    height: 50.h,
-                    width: 50.h,
-                    fit: BoxFit.cover,
-                    imageUrl: imageUrl,
-                    placeholder: (_, __) => const CircularProgressIndicator(
-                      strokeWidth: 2,
+                badge.Badge(
+                  showBadge: showBadge,
+                  badgeContent: Icon(Iconsax.shield_tick5,
+                      color: AppColors.green500, size: 20.r),
+                  badgeStyle: badge.BadgeStyle(
+                      badgeColor: Colors.white, padding: EdgeInsets.all(.0.w)),
+                  position: badge.BadgePosition.bottomEnd(bottom: 1.h, end: -5),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      height: 50.h,
+                      width: 50.h,
+                      fit: BoxFit.cover,
+                      imageUrl: imageUrl,
+                      placeholder: (_, __) => const CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                      errorWidget: (_, __, ___) =>
+                          const Icon(Icons.error, color: Colors.red),
                     ),
-                    errorWidget: (_, __, ___) =>
-                        const Icon(Icons.error, color: Colors.red),
                   ),
                 ),
                 SizedBox(width: 10.w),

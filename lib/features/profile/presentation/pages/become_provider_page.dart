@@ -286,24 +286,24 @@ class _BecomeProviderPageState extends State<BecomeProviderPage> {
                   ],
                 ),
               ),
-              SizedBox(width: 15.w),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "\u20b9 $averageCharge",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor),
-                  ),
-                  Text(
-                    "$averageTime hrs",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.grey),
-                  ),
-                ],
-              )
+              // SizedBox(width: 15.w),
+              // Column(
+              //   mainAxisSize: MainAxisSize.min,
+              //   crossAxisAlignment: CrossAxisAlignment.end,
+              //   children: [
+              //     Text(
+              //       "\u20b9 $averageCharge",
+              //       style: TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           color: Theme.of(context).primaryColor),
+              //     ),
+              //     Text(
+              //       "$averageTime hrs",
+              //       style: const TextStyle(
+              //           fontWeight: FontWeight.bold, color: Colors.grey),
+              //     ),
+              //   ],
+              // )
             ],
           ),
           SizedBox(height: 25.h),

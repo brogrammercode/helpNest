@@ -15,6 +15,7 @@ import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<String?> uploadFileAndGetUrl(
     {required File file, required String path, String bucket = "users"}) async {
@@ -77,7 +78,9 @@ Future<void> commonDialog({
                 .textTheme
                 .bodyLarge!
                 .copyWith(fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
+          SizedBox(height: 5.h),
           Text(
             description,
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
@@ -304,6 +307,7 @@ void showSnack(
     IconData icon = Iconsax.close_circle5,
     Color iconColor = Colors.red,
     required String text}) {
+  ScaffoldMessenger.of(context).clearSnackBars();
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: Colors.white,
       content: Row(
@@ -360,5 +364,19 @@ Future<List<LatLng>> fetchRoute({
   } catch (e) {
     debugPrint("Error fetching route: $e");
     return [];
+  }
+}
+
+
+call({required BuildContext context, required String phoneNumber}) async {
+  final Uri phoneUri = Uri.parse("tel:$phoneNumber");
+
+  if (await canLaunchUrl(phoneUri) && (phoneNumber.isNotEmpty)) {
+    await launchUrl(phoneUri);
+  } else {
+    showSnack(
+        // ignore: use_build_context_synchronously
+        context: context,
+        text: "Can't make a call now, Please try again later");
   }
 }

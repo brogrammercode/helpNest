@@ -1,7 +1,7 @@
 part of 'search_cubit.dart';
 
 class SearchState extends Equatable {
-  final List<UserModel> providers;
+  final List<FindServiceProviderParams> providers;
   final List<ServiceModel> services;
   final List<String> keywords;
   final StateStatus getSearchResultStatus;
@@ -24,7 +24,7 @@ class SearchState extends Equatable {
   });
 
   SearchState copyWith({
-    List<UserModel>? providers,
+    List<FindServiceProviderParams>? providers,
     List<ServiceModel>? services,
     List<String>? keywords,
     StateStatus? getSearchResultStatus,

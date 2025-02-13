@@ -45,7 +45,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       _providerSubscription = _repo.getProvider().listen((provider) {
         emit(state.copyWith(
-            provider: [provider], getProviderStatus: StateStatus.success));
+            provider: provider, getProviderStatus: StateStatus.success));
       });
     } catch (e) {
       emit(state.copyWith(
@@ -76,7 +76,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       _emergencySubscription = _repo.getEmergency().listen((emergency) {
         emit(state.copyWith(
-            emergency: [emergency], getEmergencyStatus: StateStatus.success));
+            emergency: emergency, getEmergencyStatus: StateStatus.success));
       });
     } catch (e) {
       emit(state.copyWith(

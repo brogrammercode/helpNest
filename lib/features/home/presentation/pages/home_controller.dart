@@ -59,7 +59,7 @@ class _HomeControllerState extends State<HomeController> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildBottomNavButton(
             context,
@@ -67,12 +67,12 @@ class _HomeControllerState extends State<HomeController> {
             index: 0,
             currentIndex: currentIndex,
           ),
-          _buildBottomNavButton(
-            context,
-            icon: Iconsax.briefcase,
-            index: 1,
-            currentIndex: currentIndex,
-          ),
+          // _buildBottomNavButton(
+          //   context,
+          //   icon: Iconsax.briefcase,
+          //   index: 1,
+          //   currentIndex: currentIndex,
+          // ),
           _buildBottomNavButton(
             context,
             icon: Iconsax.search_normal_1,
@@ -88,7 +88,7 @@ class _HomeControllerState extends State<HomeController> {
                   index: 3,
                   currentIndex: currentIndex,
                   badgeValue: state.orders
-                      .where((e) => e.order.status != "Completed")
+                      .where((e) => e.order.status != "Order Completed")
                       .toList()
                       .length,
                 );

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/core/utils/common_widgets.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
 import 'package:helpnest/features/order/data/models/order_model.dart';
 import 'package:helpnest/features/order/presentation/cubit/order_cubit.dart';
@@ -34,6 +35,7 @@ class _TrackPageState extends State<TrackPage> {
   List<LatLng> routeCoordinates = [];
   bool routeLoading = true;
   String? lastFetchedRoute;
+  TextEditingController _orderFee = TextEditingController();
 
   @override
   void initState() {
@@ -123,7 +125,8 @@ class _TrackPageState extends State<TrackPage> {
                       context: context,
                       provider: provider,
                       service: service,
-                      consumer: me))
+                      consumer: me,
+                      order: order))
             ],
           ),
         );
@@ -181,7 +184,8 @@ class _TrackPageState extends State<TrackPage> {
       {required BuildContext context,
       required UserModel provider,
       required ServiceModel service,
-      required UserModel consumer}) {
+      required UserModel consumer,
+      required OrderModel order}) {
     return SafeArea(
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
@@ -261,7 +265,12 @@ class _TrackPageState extends State<TrackPage> {
                       style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.r))),
-                      onPressed: () {},
+                      onPressed: () async => call(
+                          context: context,
+                          phoneNumber: order.providerID ==
+                                  FirebaseAuth.instance.currentUser?.uid
+                              ? consumer.phoneNumber
+                              : provider.phoneNumber),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -289,7 +298,34 @@ class _TrackPageState extends State<TrackPage> {
                           backgroundColor: Colors.red,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.r))),
-                      onPressed: () {},
+                      // onPressed: () => context
+                      //     .read<OrderCubit>()
+                      //     .updateOrder(
+                      //         order: order.copyWith(status: "Order Cancelled"))
+                      //     // ignore: use_build_context_synchronously
+                      //     .whenComplete(() => Navigator.pop(context)),
+                      onPressed: () async {
+                        commonDialog(
+                          context: context,
+                          title: "Confirm Order Cancellation",
+                          description:
+                              "Are you sure you want to cancel the order?",
+                          cancelText: "Go Back",
+                          cancelOnTap: () => Navigator.pop(context),
+                          agreeText: "Cancel Order",
+                          agreeOnTap: () {
+                            Navigator.pop(context);
+                            context
+                                .read<OrderCubit>()
+                                .updateOrder(
+                                    order: order.copyWith(
+                                        status: "Order Cancelled"))
+                                // ignore: use_build_context_synchronously
+                                .whenComplete(() => Navigator.pop(context));
+                          },
+                          icon: Iconsax.briefcase,
+                        );
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -309,7 +345,80 @@ class _TrackPageState extends State<TrackPage> {
                     ),
                   ),
                 ],
-              )
+              ),
+              if (order.providerID ==
+                  FirebaseAuth.instance.currentUser?.uid) ...[
+                SizedBox(height: 15.h),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: CustomTextFormField(
+                        labelText: "Order Fee",
+                        controller: _orderFee,
+                        underlineBorderedTextField: false,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      flex: 3,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            shadowColor: Theme.of(context).primaryColor,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.r))),
+                        onPressed: () async {
+                          if (_orderFee.text.isEmpty) {
+                            showSnack(
+                                context: context,
+                                text:
+                                    "Please enter order fee before completing the order");
+                          } else {
+                            commonDialog(
+                              context: context,
+                              title: "Confirm Order Completion",
+                              description:
+                                  "Are you sure you want to complete the order?",
+                              cancelText: "Cancel",
+                              cancelOnTap: () => Navigator.pop(context),
+                              agreeText: "Complete Order",
+                              agreeOnTap: () {
+                                Navigator.pop(context);
+                                context
+                                    .read<OrderCubit>()
+                                    .updateOrder(
+                                        order: order.copyWith(
+                                            orderFee:
+                                                num.tryParse(_orderFee.text),
+                                            status: "Order Completed"))
+                                    // ignore: use_build_context_synchronously
+                                    .whenComplete(() => Navigator.pop(context));
+                              },
+                              icon: Iconsax.tick_circle,
+                            );
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Complete Order",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ],
         ),
@@ -326,6 +435,9 @@ class _TrackPageState extends State<TrackPage> {
     if (routeLoading == false) {
       distance = calculateDistance(points: routeCoordinates);
     }
+
+    final isProvider =
+        order.providerID == FirebaseAuth.instance.currentUser?.uid;
     return GestureDetector(
       onTap: () => setState(() => _bottomBarExpanded = !_bottomBarExpanded),
       child: Container(
@@ -350,25 +462,43 @@ class _TrackPageState extends State<TrackPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.withOpacity(.3)),
-                      borderRadius: BorderRadius.circular(30.r)),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.circle, color: Colors.green, size: 14.r),
-                      SizedBox(width: 10.w),
-                      Text(
-                        "On the way to your location",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: isProvider && order.status != "On the Way"
+                      ? () => context.read<OrderCubit>().updateOrder(
+                          order: order.copyWith(status: "On the Way"))
+                      : null,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color:
+                            isProvider ? Theme.of(context).primaryColor : null,
+                        border: Border.all(color: Colors.grey.withOpacity(.3)),
+                        borderRadius: BorderRadius.circular(30.r)),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(isProvider ? Iconsax.gps : Icons.circle,
+                            color: isProvider ? Colors.white : Colors.green,
+                            size: 14.r),
+                        SizedBox(width: 10.w),
+                        Text(
+                          order.status != "On the Way"
+                              ? isProvider
+                                  ? "Tap to start Tracking"
+                                  : "Provider will reach you soon"
+                              : isProvider
+                                  ? "Actively Tracking"
+                                  : "On the way to your location",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isProvider ? Colors.white : null),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Text(

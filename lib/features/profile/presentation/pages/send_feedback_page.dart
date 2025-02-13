@@ -50,6 +50,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                   children: [
                     SizedBox(height: 10.h),
                     CustomTextFormField(
+                      underlineBorderedTextField: false,
                       labelText: "Select Feature",
                       controller: featureController,
                       onTap: () => commonBottomSheet(
@@ -70,6 +71,7 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
                     SizedBox(height: 10.h),
                     CustomTextFormField(
                       labelText: "Enter Description",
+                      underlineBorderedTextField: false,
                       controller: descriptionController,
                       maxLines: 10,
                       minLines: 3,
@@ -146,22 +148,29 @@ class _SendFeedbackPageState extends State<SendFeedbackPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    feedback.response.isNotEmpty
-                        ? Iconsax.shield_tick
-                        : Iconsax.clock,
-                    size: 17.r,
-                    color: feedback.response.isNotEmpty
-                        ? Theme.of(context).primaryColor
-                        : null,
-                  ),
-                  SizedBox(width: 10.w),
-                  Text(feedback.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      feedback.response.isNotEmpty
+                          ? Iconsax.shield_tick
+                          : Iconsax.clock,
+                      size: 17.r,
+                      color: feedback.response.isNotEmpty
+                          ? Theme.of(context).primaryColor
+                          : null,
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Text(feedback.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
               ),
+              SizedBox(width: 30.w),
               Text(formattedDate),
             ],
           ),

@@ -8,6 +8,7 @@ import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/core/utils/common_widgets.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
+import 'package:iconsax/iconsax.dart';
 
 class BecomeProviderStatusPage extends StatelessWidget {
   const BecomeProviderStatusPage({super.key});
@@ -33,6 +34,16 @@ class BecomeProviderStatusPage extends StatelessWidget {
                   .bodyLarge!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
+            actions: [
+              IconButton(
+                  onPressed: () => Navigator.pushNamed(
+                      context, AppRoutes.becomeProviderPage),
+                  icon: Icon(
+                    Iconsax.edit,
+                    size: 20.r,
+                  )),
+              SizedBox(width: 10.w),
+            ],
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -40,7 +51,6 @@ class BecomeProviderStatusPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20.h),
                   Text("Aadhar Card",
                       style: Theme.of(context)
                           .textTheme

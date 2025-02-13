@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/core/config/color.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/config/routes.dart';
 import 'package:helpnest/core/utils/common_methods.dart';
@@ -13,6 +14,7 @@ import 'package:helpnest/features/home/presentation/cubit/home_cubit.dart';
 import 'package:helpnest/features/profile/presentation/cubit/profile_state.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:badges/badges.dart' as badge;
 
 class ProfileMainPage extends StatefulWidget {
   const ProfileMainPage({super.key});
@@ -152,7 +154,9 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
   }
 
   Widget _buildProfileImages(
-      {required String? providerImage, required String? serviceLogo}) {
+      {required String? providerImage,
+      required String? serviceLogo,
+      required ProfileState state}) {
     return Center(
       child: SizedBox(
         width: 200.w,
@@ -170,6 +174,9 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
             Align(
               alignment: Alignment.centerRight,
               child: _buildCircularImage(
+                verified: state.provider.isNotEmpty
+                    ? state.provider.first.status == "verified"
+                    : null,
                 imageUrl: providerImage ??
                     "https://cdn.dribbble.com/userupload/16366138/file/original-c35bbf68ba08abeb0509f09de77dd62b.jpg?resize=1600x1200&vertical=center",
               ),
@@ -180,32 +187,45 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
     );
   }
 
-  Widget _buildCircularImage({required String imageUrl, bool padded = false}) {
-    return Container(
-      alignment: Alignment.center,
-      height: 125.h,
-      width: 125.h,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
-        ],
-        border: Border.all(color: Colors.white, width: 7.w),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100),
-        child: Container(
-          padding: EdgeInsets.all(padded ? 20.r : 0),
-          child: CachedNetworkImage(
-            height: 125.h,
-            width: 125.h,
-            fit: BoxFit.cover,
-            errorWidget: (c, u, e) {
-              log("CACHED_IMAGE_ERROR: $e");
-              return const Icon(Iconsax.gallery);
-            },
-            imageUrl: imageUrl,
+  Widget _buildCircularImage(
+      {required String imageUrl, bool padded = false, bool? verified}) {
+    return badge.Badge(
+      showBadge: verified != null,
+      badgeContent: Icon(
+          verified != null && verified ? Iconsax.shield_tick5 : Iconsax.clock,
+          color: verified != null && verified
+              ? AppColors.green500
+              : Colors.grey.withOpacity(.8),
+          size: 30.r),
+      badgeStyle: badge.BadgeStyle(
+          badgeColor: Colors.white, padding: EdgeInsets.all(3.w)),
+      position: badge.BadgePosition.bottomEnd(bottom: 3.h, end: 2.w),
+      child: Container(
+        alignment: Alignment.center,
+        height: 125.h,
+        width: 125.h,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
+          ],
+          border: Border.all(color: Colors.white, width: 7.w),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: Container(
+            padding: EdgeInsets.all(padded ? 20.r : 0),
+            child: CachedNetworkImage(
+              height: 125.h,
+              width: 125.h,
+              fit: BoxFit.cover,
+              errorWidget: (c, u, e) {
+                log("CACHED_IMAGE_ERROR: $e");
+                return const Icon(Iconsax.gallery);
+              },
+              imageUrl: imageUrl,
+            ),
           ),
         ),
       ),
@@ -224,7 +244,8 @@ class _ProfileMainPageState extends State<ProfileMainPage> {
                   .services
                   .where((e) => e.id == state.provider.first.serviceID)
                   .first
-                  .logo)
+                  .logo,
+              state: state)
         ] else ...[
           SizedBox(
             height: 135.h,

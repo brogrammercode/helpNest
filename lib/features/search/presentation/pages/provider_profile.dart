@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:helpnest/core/config/color.dart';
 import 'package:helpnest/core/config/error.dart';
 import 'package:helpnest/core/utils/common_methods.dart';
 import 'package:helpnest/features/auth/data/models/user_model.dart';
@@ -18,6 +19,7 @@ import 'package:helpnest/features/service/domain/repo/service_remote_repo.dart';
 import 'package:helpnest/features/service/presentation/cubit/service_state.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:badges/badges.dart' as badge;
 
 class ProviderProfile extends StatefulWidget {
   final FindServiceProviderParams provider;
@@ -29,7 +31,9 @@ class ProviderProfile extends StatefulWidget {
 
 class _ProviderProfileState extends State<ProviderProfile> {
   ServiceModel? service;
-  num avgRating = 5;
+  num avgRating = 2.5;
+  num avgFee = 0;
+  num experience = 0;
 
   @override
   void initState() {
@@ -42,6 +46,12 @@ class _ProviderProfileState extends State<ProviderProfile> {
       double totalRating = widget.provider.feedbacks
           .fold(0, (sum, feedback) => sum + feedback.rating);
       avgRating = totalRating / widget.provider.feedbacks.length;
+    }
+    if (widget.provider.orders.isNotEmpty) {
+      double totalFee =
+          widget.provider.orders.fold(0, (sum, order) => sum + order.orderFee);
+      avgFee = totalFee / widget.provider.orders.length;
+      experience = widget.provider.orders.length;
     }
 
     super.initState();
@@ -64,7 +74,7 @@ class _ProviderProfileState extends State<ProviderProfile> {
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             Text(service?.name ?? "Service"),
             SizedBox(height: 10.h),
-            _buildRatingRow(false),
+            _buildRatingRow(avgRating.toDouble(), false),
             SizedBox(height: 30.h),
             _buildDetailsSection(context),
             _buildLocationSection(location: widget.provider.user.location),
@@ -191,7 +201,8 @@ class _ProviderProfileState extends State<ProviderProfile> {
             ),
             Align(
               alignment: Alignment.centerRight,
-              child: _buildCircularImage(imageUrl: providerImage),
+              child:
+                  _buildCircularImage(imageUrl: providerImage, verified: true),
             ),
           ],
         ),
@@ -199,54 +210,81 @@ class _ProviderProfileState extends State<ProviderProfile> {
     );
   }
 
-  Widget _buildCircularImage({required String imageUrl, bool padded = false}) {
-    return Container(
-      alignment: Alignment.center,
-      height: 125.h,
-      width: 125.h,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
-        ],
-        border: Border.all(color: Colors.white, width: 7.w),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100),
-        child: Container(
-          padding: EdgeInsets.all(padded ? 20.r : 0),
-          child: CachedNetworkImage(
-            height: 125.h,
-            width: 125.h,
-            fit: BoxFit.cover,
-            errorWidget: (c, u, e) {
-              return const Icon(Iconsax.gallery);
-            },
-            imageUrl: imageUrl,
+  Widget _buildCircularImage(
+      {required String imageUrl, bool padded = false, bool verified = false}) {
+    return badge.Badge(
+      showBadge: verified,
+      badgeContent:
+          Icon(Iconsax.shield_tick5, color: AppColors.green500, size: 30.r),
+      badgeStyle: badge.BadgeStyle(
+          badgeColor: Colors.white, padding: EdgeInsets.all(3.w)),
+      position: badge.BadgePosition.bottomEnd(bottom: 3.h, end: 2.w),
+      child: Container(
+        alignment: Alignment.center,
+        height: 125.h,
+        width: 125.h,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(.15), blurRadius: 10),
+          ],
+          border: Border.all(color: Colors.white, width: 7.w),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: Container(
+            padding: EdgeInsets.all(padded ? 20.r : 0),
+            child: CachedNetworkImage(
+              height: 125.h,
+              width: 125.h,
+              fit: BoxFit.cover,
+              errorWidget: (c, u, e) {
+                return const Icon(Iconsax.gallery);
+              },
+              imageUrl: imageUrl,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildRatingRow(bool small) {
+  Widget _buildRatingRow(double avgRating, bool small) {
+    int fullStars = avgRating.floor();
+    bool hasHalfStar = (avgRating - fullStars) >= 0.5;
+    int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(5, (index) => _buildStarIcon(small)),
+      children: [
+        // ⭐ Full Stars
+        for (int i = 0; i < fullStars; i++)
+          _buildStarIcon(small, Iconsax.star_15, Colors.orange),
+
+        // ⭐ Half Star (if applicable)
+        if (hasHalfStar)
+          _buildStarIcon(
+              small, Iconsax.star_15, Colors.orange.withOpacity(0.5)),
+
+        // ⭐ Empty Stars
+        for (int i = 0; i < emptyStars; i++)
+          _buildStarIcon(small, Iconsax.star, Colors.grey),
+      ],
     );
   }
 
-  Widget _buildStarIcon(bool small) {
+  Widget _buildStarIcon(bool small, IconData icon, Color? color) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 2.5.w),
       child: Icon(
-        Iconsax.star_15,
+        icon,
         size: small ? 15.h : null,
-        color: small ? Theme.of(context).primaryColor : Colors.orange,
+        color: color,
       ),
     );
   }
+
 
   Widget _buildDetailsSection(BuildContext context) {
     return Padding(
@@ -258,14 +296,14 @@ class _ProviderProfileState extends State<ProviderProfile> {
             context,
             icon: Iconsax.briefcase,
             title: "Experience",
-            value: "5000+",
+            value: experience != 0 ? "$experience+" : "Begin",
           ),
           SizedBox(width: 20.w),
           _buildDetailCard(
             context,
             icon: Iconsax.wallet_2,
             title: "Service Fee",
-            value: "\u20b9 500",
+            value: avgFee == 0 ? "N/A" : "\u20b9 500",
           ),
         ],
       ),
@@ -368,17 +406,24 @@ class _ProviderProfileState extends State<ProviderProfile> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                feedback.title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  feedback.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Text(DateFormat("mmm dd").format(feedback.creationTD.toDate())),
+              SizedBox(width: 30.w),
+              Text(DateFormat("MMM dd").format(feedback.creationTD.toDate())),
             ],
           ),
           SizedBox(height: 10.h),
           Row(
             children: List.generate(
-                feedback.rating.toInt(), (index) => _buildStarIcon(true)),
+                feedback.rating.toInt(),
+                (index) => _buildStarIcon(
+                    true, Iconsax.star_15, Theme.of(context).primaryColor)),
           ),
           SizedBox(height: 10.h),
           Text(

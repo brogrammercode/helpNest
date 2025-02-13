@@ -43,17 +43,28 @@ class ProfileRemoteDs implements ProfileRepo {
   }
 
   @override
-  Stream<ServiceProviderModel> getProvider() {
+  Stream<List<ServiceProviderModel>> getProvider() {
     try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        return Stream.value([]);
+      }
+
       return firestore
           .collection('service_providers')
-          .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+          .doc(userId)
           .snapshots()
-          .map((doc) => ServiceProviderModel.fromJson(doc.data()!));
+          .map((doc) {
+        if (!doc.exists || doc.data() == null) {
+          return [];
+        }
+        return [ServiceProviderModel.fromJson(doc.data()!)];
+      });
     } catch (e) {
-      throw Exception('Error fetching provider: $e');
+      return Stream.value([]);
     }
   }
+
 
   @override
   Stream<UserModel> getUser() {
@@ -69,11 +80,11 @@ class ProfileRemoteDs implements ProfileRepo {
   }
 
   @override
-  Stream<EmergencyModel> getEmergency() {
+  Stream<List<EmergencyModel>> getEmergency() {
     try {
       final userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
-        return Stream.error('User is not logged in');
+        return Stream.value([]);
       }
 
       return firestore
@@ -83,14 +94,11 @@ class ProfileRemoteDs implements ProfileRepo {
           .orderBy("emergencyTD", descending: true)
           .limit(1)
           .snapshots()
-          .map((snapshot) {
-        if (snapshot.docs.isEmpty) {
-          throw Exception('No active emergency reports found');
-        }
-        return EmergencyModel.fromJson(snapshot.docs.first.data());
-      });
+          .map((snapshot) => snapshot.docs.isNotEmpty
+              ? [EmergencyModel.fromJson(snapshot.docs.first.data())]
+              : []);
     } catch (e) {
-      return Stream.error('Error fetching latest emergency: $e');
+      return Stream.value([]);
     }
   }
 
@@ -147,7 +155,8 @@ class ProfileRemoteDs implements ProfileRepo {
                 panCardImageURL: panUrl ?? "",
                 experienceDocImageURL: experienceUrl ?? "",
               )
-              .toJson());
+              .toJson(),
+          SetOptions(merge: true));
     } catch (e) {
       throw Exception('Error requesting provider access: $e');
     }

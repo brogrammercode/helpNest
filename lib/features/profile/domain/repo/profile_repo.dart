@@ -12,9 +12,9 @@ abstract class ProfileRepo {
       required File? pan,
       required File? experience});
   Stream<UserModel> getUser();
-  Stream<ServiceProviderModel> getProvider();
+  Stream<List<ServiceProviderModel>> getProvider();
   Stream<List<FeedbackModel>> getAppFeedback();
-  Stream<EmergencyModel> getEmergency();
+  Stream<List<EmergencyModel>> getEmergency();
   Future<void> addFeedback({required FeedbackModel feedback});
   Future<void> reportSafetyEmergency({required EmergencyModel emergency});
   Future<void> updateUser({required UserModel user, required File? image});

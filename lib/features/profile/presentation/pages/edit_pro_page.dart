@@ -60,13 +60,7 @@ class _EditProPageState extends State<EditProPage> {
                   controller: _name,
                   underlineBorderedTextField: true,
                 ),
-                SizedBox(height: 20.h),
-                CustomTextFormField(
-                  labelText: "Phone Number",
-                  controller: _phoneNumber,
-                  keyboardType: TextInputType.number,
-                  underlineBorderedTextField: true,
-                ),
+                
                 SizedBox(height: 20.h),
                 CustomTextFormField(
                   labelText: "Email Address",
@@ -88,6 +82,14 @@ class _EditProPageState extends State<EditProPage> {
                       }),
                   suffixIcon: Iconsax.arrow_down_1,
                   keyboardType: TextInputType.text,
+                  underlineBorderedTextField: true,
+                ),
+                SizedBox(height: 20.h),
+                CustomTextFormField(
+                  labelText: "Phone Number",
+                  controller: _phoneNumber,
+                  maxLength: 10,
+                  keyboardType: TextInputType.number,
                   underlineBorderedTextField: true,
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:helpnest/features/auth/presentation/pages/onboarding_page.dart';
 import 'package:helpnest/features/home/presentation/pages/home_controller.dart';
+import 'package:helpnest/features/order/presentation/pages/past_order.dart';
 import 'package:helpnest/features/profile/presentation/pages/about_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/become_provider_page.dart';
 import 'package:helpnest/features/profile/presentation/pages/become_provider_status_page.dart';
@@ -37,6 +38,9 @@ class AppRoutes {
 
   // search
   static const String providerProfile = '/providerProfile';
+
+  // order
+  static const String pastOrder = '/pastOrder';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -87,13 +91,14 @@ class AppRoutes {
                   provider: args?['provider'],
                 ));
 
-      // case consumerDetail:
-      //   final args = settings.arguments as Map<String, dynamic>?;
-      //   return MaterialPageRoute(
-      //     builder: (_) => ConsumerDetailPage(
-      //       consumer: args?['consumer'],
-      //     ),
-      //   );
+      // order
+      case pastOrder:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+            builder: (_) => PastOrder(
+                  provider: args?['provider'],
+                ));
+
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(),

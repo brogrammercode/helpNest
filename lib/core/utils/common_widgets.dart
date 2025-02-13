@@ -13,6 +13,7 @@ class CustomTextFormField extends StatelessWidget {
   final String? hintText;
   final TextEditingController controller;
   final int? maxLines;
+  final int? maxLength;
   final int? minLines;
   final bool isEnabled;
   final TextInputType keyboardType;
@@ -25,6 +26,7 @@ class CustomTextFormField extends StatelessWidget {
     required this.labelText,
     this.hintText,
     required this.controller,
+    this.maxLength,
     this.maxLines,
     this.minLines,
     this.isEnabled = true,
@@ -44,9 +46,9 @@ class CustomTextFormField extends StatelessWidget {
         absorbing: !isEnabled,
         child: TextFormField(
           controller: controller,
-
           maxLines: maxLines,
           minLines: minLines,
+          maxLength: maxLength,
           enabled: isEnabled && onTap == null,
           keyboardType: keyboardType,
           validator: validator,
@@ -137,7 +139,7 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
   Widget build(BuildContext context) {
     return badge.Badge(
       position: widget.circularMode
-          ? badge.BadgePosition.bottomEnd(bottom: 0.h, end: 20.h)
+          ? badge.BadgePosition.bottomEnd(bottom: 15.h, end: 2.w)
           : badge.BadgePosition.topEnd(top: 20.h, end: 20.h),
       badgeContent: Icon(Icons.edit,
           color: widget.circularMode ? Colors.white : Colors.black, size: 17.r),
@@ -147,12 +149,7 @@ class _CustomImageUploaderState extends State<CustomImageUploader> {
               : Colors.white),
       showBadge: (widget.image != null || widget.imageUrl != null) &&
           (!widget.readOnly),
-      onTap: () {
-        setState(() {
-          widget.image = null;
-        });
-        widget.onCancel;
-      },
+      onTap: widget.readOnly ? () {} : _pickImage,
       child: GestureDetector(
         onTap: widget.readOnly ? () {} : _pickImage,
         child: Container(

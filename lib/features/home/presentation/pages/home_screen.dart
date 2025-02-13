@@ -117,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (activeWidget != null) {
       return ElevatedButton(
         onPressed: onPressed,
-        
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -456,7 +455,7 @@ class LocationBottomSheet extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      "updated on: ${DateFormat("hh:mm a").format(location.updateTD.toDate())}",
+                      "updated: ${DateFormat("dd MMM, hh:mm a").format(location.updateTD.toDate())}",
                       style: const TextStyle(
                           color: Colors.grey, fontWeight: FontWeight.bold),
                     )
